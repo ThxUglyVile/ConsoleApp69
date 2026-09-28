@@ -4,97 +4,139 @@ using System.Linq;
 
 namespace RestaurantProgram
 {
-    // 1. Ресторан
+    // 1. Restaurant
     class Restaurant
     {
-        public string Назва { get; set; }
-        public string Адреса { get; set; }
-        public string Кухня { get; set; }
-        public int КількістьСтоликів { get; set; }
-        public int КількістьПрацівників { get; set; }
+        public string Name { get; set; }
+        public string Address { get; set; }
+        public string Cuisine { get; set; }
+        public int TableCount { get; set; }
+        public int EmployeeCount { get; set; }
 
-        public void ПоказатиІнформацію()
+        public void ShowInformation()
         {
             Console.WriteLine("\n===== РЕСТОРАН =====");
-            Console.WriteLine("Назва: " + Назва);
-            Console.WriteLine("Адреса: " + Адреса);
-            Console.WriteLine("Кухня: " + Кухня);
-            Console.WriteLine("Столиків: " + КількістьСтоликів);
-            Console.WriteLine("Працівників: " + КількістьПрацівників);
+            Console.WriteLine("Назва: " + Name);
+            Console.WriteLine("Адреса: " + Address);
+            Console.WriteLine("Кухня: " + Cuisine);
+            Console.WriteLine("Столиків: " + TableCount);
+            Console.WriteLine("Працівників: " + EmployeeCount);
+        }
+
+        // Method 1
+        public void AddTable()
+        {
+            TableCount++;
+            Console.WriteLine("Кількість столиків збільшено.");
+        }
+
+        // Method 2
+        public void AddEmployee()
+        {
+            EmployeeCount++;
+            Console.WriteLine("Кількість працівників збільшено.");
         }
     }
 
-    // 2. Працівник
+    // 2. Employee
     class Employee
     {
         public int Id { get; set; }
-        public string Імя { get; set; }
-        public int Вік { get; set; }
-        public string Посада { get; set; }
-        public double Зарплата { get; set; }
+        public string Name { get; set; }
+        public int Age { get; set; }
+        public string Position { get; set; }
+        public double Salary { get; set; }
 
-        public void ПоказатиІнформацію()
+        public void ShowInformation()
         {
             Console.WriteLine(
-                Id + ". " + Імя +
-                " | " + Посада +
-                " | " + Зарплата + " грн" +
-                " | " + Вік + " років");
+                Id + ". " + Name +
+                " | " + Position +
+                " | " + Salary + " грн" +
+                " | " + Age + " років");
+        }
+
+        // Method 1
+        public void IncreaseSalary(double amount)
+        {
+            if (amount > 0)
+                Salary += amount;
+        }
+
+        // Method 2
+        public bool IsAdult()
+        {
+            return Age >= 18;
         }
     }
 
-    // 3. Страва
+    // 3. Dish
     class Dish
     {
         public int Id { get; set; }
-        public string Назва { get; set; }
-        public string Категорія { get; set; }
-        public double Ціна { get; set; }
-        public int Вага { get; set; }
+        public string Name { get; set; }
+        public string Category { get; set; }
+        public double Price { get; set; }
+        public int Weight { get; set; }
 
-        public void ПоказатиІнформацію()
+        public void ShowInformation()
         {
             Console.WriteLine(
-                Id + ". " + Назва +
-                " | " + Категорія +
-                " | " + Ціна + " грн" +
-                " | " + Вага + " г");
+                Id + ". " + Name +
+                " | " + Category +
+                " | " + Price + " грн" +
+                " | " + Weight + " г");
+        }
+
+        // Method 1
+        public double GetPriceWithDiscount(double discount)
+        {
+            if (discount < 0 || discount > 100)
+                return Price;
+
+            return Price - Price * discount / 100;
+        }
+
+        // Method 2
+        public bool IsExpensive(double limit)
+        {
+            return Price > limit;
         }
     }
 
-    // 4. Меню
+    // 4. Menu
     class Menu
     {
-        public string Назва { get; set; }
-        public List<Dish> Страви { get; set; } = new List<Dish>();
+        public string Name { get; set; }
+        public List<Dish> Dishes { get; set; } = new List<Dish>();
 
-        public void Показати()
+        public void Show()
         {
             Console.WriteLine("\n===== МЕНЮ =====");
 
-            if (Страви.Count == 0)
+            if (Dishes.Count == 0)
             {
                 Console.WriteLine("Меню порожнє.");
                 return;
             }
 
-            foreach (Dish страва in Страви)
-                страва.ПоказатиІнформацію();
+            foreach (Dish dish in Dishes)
+                dish.ShowInformation();
         }
 
-        public void ДодатиСтраву(Dish страва)
+        public void AddDish(Dish dish)
         {
-            Страви.Add(страва);
+            Dishes.Add(dish);
             Console.WriteLine("Страву додано.");
         }
 
-        public void ВидалитиСтраву(int id)
+        public void RemoveDish(int id)
         {
-            Dish страва = Страви.FirstOrDefault(d => d.Id == id);
+            Dish dish = Dishes.FirstOrDefault(d => d.Id == id);
 
-            if (страва != null)
+            if (dish != null)
             {
-                Страви.Remove(страва);
+                Dishes.Remove(dish);
                 Console.WriteLine("Страву видалено.");
             }
             else
@@ -102,103 +144,159 @@ namespace RestaurantProgram
                 Console.WriteLine("Страву не знайдено.");
             }
         }
+
+        // Method 1
+        public Dish FindDish(string name)
+        {
+            return Dishes.FirstOrDefault(
+                d => d.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        }
+
+        // Method 2
+        public double GetAveragePrice()
+        {
+            if (Dishes.Count == 0)
+                return 0;
+
+            return Dishes.Average(d => d.Price);
+        }
     }
 
-    // 5. Клієнт
+    // 5. Customer
     class Customer
     {
         public int Id { get; set; }
-        public string Імя { get; set; }
-        public int Вік { get; set; }
-        public string Телефон { get; set; }
+        public string Name { get; set; }
+        public int Age { get; set; }
+        public string Phone { get; set; }
 
-        public void ПоказатиІнформацію()
+        public void ShowInformation()
         {
             Console.WriteLine(
-                Id + ". " + Імя +
-                " | " + Вік + " років" +
-                " | " + Телефон);
+                Id + ". " + Name +
+                " | " + Age + " років" +
+                " | " + Phone);
+        }
+
+        // Method 1
+        public bool IsAdult()
+        {
+            return Age >= 18;
+        }
+
+        // Method 2
+        public string GetContact()
+        {
+            return Name + " - " + Phone;
         }
     }
 
-    // 6. Замовлення
+    // 6. Order
     class Order
     {
         public int Id { get; set; }
-        public string ІмяКлієнта { get; set; }
-        public string НазваСтрави { get; set; }
-        public int Кількість { get; set; }
-        public double ЗагальнаЦіна { get; set; }
+        public string CustomerName { get; set; }
+        public string DishName { get; set; }
+        public int Quantity { get; set; }
+        public double TotalPrice { get; set; }
+        public double Discount { get; set; }
 
-        public void ПоказатиІнформацію()
+        public void ShowInformation()
         {
             Console.WriteLine(
                 "Замовлення №" + Id +
-                " | Клієнт: " + ІмяКлієнта +
-                " | " + НазваСтрави +
-                " x" + Кількість +
-                " | " + ЗагальнаЦіна + " грн");
+                " | Клієнт: " + CustomerName +
+                " | " + DishName +
+                " x" + Quantity +
+                " | Знижка: " + Discount + "%" +
+                " | До сплати: " + TotalPrice + " грн");
+        }
+
+        // Method 1
+        public double CalculateDiscount(double discountPercent)
+        {
+            if (discountPercent < 0 || discountPercent > 100)
+                return TotalPrice;
+
+            return TotalPrice - TotalPrice * discountPercent / 100;
+        }
+
+        // Method 2
+        public void ApplyDiscount(double discountPercent)
+        {
+            if (discountPercent < 0 || discountPercent > 100)
+                return;
+
+            Discount = discountPercent;
+            TotalPrice = CalculateDiscount(discountPercent);
         }
     }
 
-    // 7. Столик
+    // 7. Table
     class Table
     {
-        public int Номер { get; set; }
-        public int Місця { get; set; }
-        public bool Вільний { get; set; }
+        public int Number { get; set; }
+        public int Seats { get; set; }
+        public bool IsFree { get; set; }
+        public string ReservedBy { get; set; }
 
-        public void ПоказатиІнформацію()
+        public void ShowInformation()
         {
-            string статус = Вільний ? "Вільний" : "Зайнятий";
+            string status = IsFree ? "Вільний" : "Заброньований";
 
             Console.WriteLine(
-                "Столик №" + Номер +
-                " | Місць: " + Місця +
-                " | " + статус);
+                "Столик №" + Number +
+                " | Місць: " + Seats +
+                " | " + status +
+                (IsFree ? "" : " | Забронював: " + ReservedBy));
         }
 
-        public void Забронювати()
+        // Method 1
+        public bool Reserve(string customerName)
         {
-            if (Вільний)
-            {
-                Вільний = false;
-                Console.WriteLine("Столик заброньовано.");
-            }
-            else
-            {
-                Console.WriteLine("Столик уже зайнятий.");
-            }
+            if (!IsFree)
+                return false;
+
+            IsFree = false;
+            ReservedBy = customerName;
+            return true;
+        }
+
+        // Method 2
+        public void CancelReservation()
+        {
+            IsFree = true;
+            ReservedBy = "";
         }
     }
 
-    // Основна програма
+    // Main program
     class Program
     {
-        static Restaurant ресторан = new Restaurant
+        static Restaurant restaurant = new Restaurant
         {
-            Назва = "La Piazza",
-            Адреса = "вул. Центральна, 15",
-            Кухня = "Італійська",
-            КількістьСтоликів = 5,
-            КількістьПрацівників = 2
+            Name = "La Piazza",
+            Address = "вул. Центральна, 15",
+            Cuisine = "Італійська",
+            TableCount = 5,
+            EmployeeCount = 2
         };
 
-        static Menu меню = new Menu
+        static Menu menu = new Menu
         {
-            Назва = "Основне меню"
+            Name = "Основне меню"
         };
 
-        static List<Employee> працівники = new List<Employee>();
-        static List<Customer> клієнти = new List<Customer>();
-        static List<Order> замовлення = new List<Order>();
-        static List<Table> столики = new List<Table>();
+        static List<Employee> employees = new List<Employee>();
+        static List<Customer> customers = new List<Customer>();
+        static List<Order> orders = new List<Order>();
+        static List<Table> tables = new List<Table>();
 
         static void Main()
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
 
-            ІніціалізуватиДані();
+            InitializeData();
 
             while (true)
             {
@@ -218,63 +316,73 @@ namespace RestaurantProgram
                 Console.WriteLine("9. Скасувати замовлення");
                 Console.WriteLine("10. Забронювати столик");
                 Console.WriteLine("11. Показати столики");
+                Console.WriteLine("12. Скасувати бронювання");
+                Console.WriteLine("13. Застосувати знижку до замовлення");
                 Console.WriteLine("0. Вихід");
                 Console.WriteLine("==========================");
 
                 Console.Write("Оберіть дію: ");
-                string вибір = Console.ReadLine();
+                string choice = Console.ReadLine();
 
-                switch (вибір)
+                switch (choice)
                 {
                     case "1":
-                        ресторан.ПоказатиІнформацію();
+                        restaurant.ShowInformation();
                         break;
 
                     case "2":
-                        меню.Показати();
+                        menu.Show();
                         break;
 
                     case "3":
-                        ДодатиСтраву();
+                        AddDish();
                         break;
 
                     case "4":
-                        ВидалитиСтраву();
+                        RemoveDish();
                         break;
 
                     case "5":
-                        ДодатиКлієнта();
+                        AddCustomer();
                         break;
 
                     case "6":
-                        ПоказатиКлієнтів();
+                        ShowCustomers();
                         break;
 
                     case "7":
-                        СтворитиЗамовлення();
+                        CreateOrder();
                         break;
 
                     case "8":
-                        ПоказатиЗамовлення();
+                        ShowOrders();
                         break;
 
                     case "9":
-                        СкасуватиЗамовлення();
+                        CancelOrder();
                         break;
 
                     case "10":
-                        ЗабронюватиСтолик();
+                        ReserveTable();
                         break;
 
                     case "11":
-                        ПоказатиСтолики();
+                        ShowTables();
+                        break;
+
+                    case "12":
+                        CancelTableReservation();
+                        break;
+
+                    case "13":
+                        ApplyDiscountToOrder();
                         break;
 
                     case "0":
                         return;
 
                     default:
-                        Console.WriteLine("Невірний вибір. Введіть номер пункту меню від 0 до 11.");
+                        Console.WriteLine("Невірний вибір.");
                         break;
                 }
 
@@ -283,405 +391,525 @@ namespace RestaurantProgram
             }
         }
 
-        static void ІніціалізуватиДані()
+        static void InitializeData()
         {
-            меню.ДодатиСтраву(new Dish
+            menu.AddDish(new Dish
             {
                 Id = 1,
-                Назва = "Маргарита",
-                Категорія = "Піца",
-                Ціна = 250,
-                Вага = 500
+                Name = "Маргарита",
+                Category = "Піца",
+                Price = 250,
+                Weight = 500
             });
 
-            меню.ДодатиСтраву(new Dish
+            menu.AddDish(new Dish
             {
                 Id = 2,
-                Назва = "Пепероні",
-                Категорія = "Піца",
-                Ціна = 300,
-                Вага = 550
+                Name = "Пепероні",
+                Category = "Піца",
+                Price = 300,
+                Weight = 550
             });
 
-            меню.ДодатиСтраву(new Dish
+            menu.AddDish(new Dish
             {
                 Id = 3,
-                Назва = "Карбонара",
-                Категорія = "Паста",
-                Ціна = 220,
-                Вага = 350
+                Name = "Карбонара",
+                Category = "Паста",
+                Price = 220,
+                Weight = 350
             });
 
-            клієнти.Add(new Customer
+            customers.Add(new Customer
             {
                 Id = 1,
-                Імя = "Михайло",
-                Вік = 21,
-                Телефон = "380502223344"
+                Name = "Михайло",
+                Age = 21,
+                Phone = "380502223344"
             });
 
-            працівники.Add(new Employee
+            employees.Add(new Employee
             {
                 Id = 1,
-                Імя = "Олексій",
-                Вік = 28,
-                Посада = "Кухар",
-                Зарплата = 25000
+                Name = "Олексій",
+                Age = 28,
+                Position = "Кухар",
+                Salary = 25000
             });
 
-            працівники.Add(new Employee
+            employees.Add(new Employee
             {
                 Id = 2,
-                Імя = "Анна",
-                Вік = 25,
-                Посада = "Офіціант",
-                Зарплата = 18000
+                Name = "Анна",
+                Age = 25,
+                Position = "Офіціант",
+                Salary = 18000
             });
 
             for (int i = 1; i <= 5; i++)
             {
-                столики.Add(new Table
+                tables.Add(new Table
                 {
-                    Номер = i,
-                    Місця = i % 2 == 0 ? 4 : 2,
-                    Вільний = true
+                    Number = i,
+                    Seats = i % 2 == 0 ? 4 : 2,
+                    IsFree = true,
+                    ReservedBy = ""
                 });
             }
         }
 
-        static void ДодатиСтраву()
+        static void AddDish()
         {
             Console.WriteLine("\n===== ДОДАВАННЯ СТРАВИ =====");
 
-            string назва = ВвестиНепорожнійТекст("Назва: ");
-            string категорія = ВвестиНепорожнійТекст("Категорія: ");
-            double ціна = ВвестиДодатнеЧисло("Ціна: ");
-            int вага = ВвестиДодатнеЦіле("Вага (г): ");
+            string name = EnterNonEmptyText("Назва: ");
+            string category = EnterNonEmptyText("Категорія: ");
+            double price = EnterPositiveNumber("Ціна: ");
+            int weight = EnterPositiveInteger("Вага (г): ");
 
-            if (меню.Страви.Any(d =>
-                d.Назва.Equals(назва, StringComparison.OrdinalIgnoreCase)))
+            if (menu.Dishes.Any(d =>
+                d.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
             {
                 Console.WriteLine("Страва з такою назвою вже існує.");
                 return;
             }
 
-            int id = меню.Страви.Count == 0
+            int id = menu.Dishes.Count == 0
                 ? 1
-                : меню.Страви.Max(d => d.Id) + 1;
+                : menu.Dishes.Max(d => d.Id) + 1;
 
-            меню.ДодатиСтраву(new Dish
+            menu.AddDish(new Dish
             {
                 Id = id,
-                Назва = назва,
-                Категорія = категорія,
-                Ціна = ціна,
-                Вага = вага
+                Name = name,
+                Category = category,
+                Price = price,
+                Weight = weight
             });
         }
 
-        static void ВидалитиСтраву()
+        static void RemoveDish()
         {
-            меню.Показати();
+            menu.Show();
 
-            if (меню.Страви.Count == 0)
+            if (menu.Dishes.Count == 0)
                 return;
 
-            int id = ВвестиДодатнеЦіле("\nВведіть ID страви: ");
-            меню.ВидалитиСтраву(id);
+            int id = EnterPositiveInteger("\nВведіть ID страви: ");
+            menu.RemoveDish(id);
         }
 
-        static void ДодатиКлієнта()
+        static void AddCustomer()
         {
             Console.WriteLine("\n===== ДОДАВАННЯ КЛІЄНТА =====");
 
-            string імʼя = ВвестиІмя("Ім'я: ");
-            int вік = ВвестиВік("Вік: ");
-            string телефон = ВвестиТелефон("Телефон (тільки цифри): ");
+            string name = EnterName("Ім'я: ");
+            int age = EnterAge("Вік: ");
+            string phone = EnterPhone("Телефон (тільки цифри): ");
 
-            if (клієнти.Any(c => c.Телефон == телефон))
+            if (customers.Any(c => c.Phone == phone))
             {
                 Console.WriteLine("Клієнт з таким номером телефону вже існує.");
                 return;
             }
 
-            int id = клієнти.Count == 0
+            int id = customers.Count == 0
                 ? 1
-                : клієнти.Max(c => c.Id) + 1;
+                : customers.Max(c => c.Id) + 1;
 
-            клієнти.Add(new Customer
+            customers.Add(new Customer
             {
                 Id = id,
-                Імя = імʼя,
-                Вік = вік,
-                Телефон = телефон
+                Name = name,
+                Age = age,
+                Phone = phone
             });
 
             Console.WriteLine("Клієнта додано.");
         }
 
-        static void ПоказатиКлієнтів()
+        static void ShowCustomers()
         {
             Console.WriteLine("\n===== КЛІЄНТИ =====");
 
-            if (клієнти.Count == 0)
+            if (customers.Count == 0)
             {
                 Console.WriteLine("Клієнтів немає.");
                 return;
             }
 
-            foreach (Customer клієнт in клієнти)
-                клієнт.ПоказатиІнформацію();
+            foreach (Customer customer in customers)
+                customer.ShowInformation();
         }
 
-        static void СтворитиЗамовлення()
+        static void CreateOrder()
         {
             Console.WriteLine("\n===== СТВОРЕННЯ ЗАМОВЛЕННЯ =====");
 
-            if (клієнти.Count == 0)
+            if (customers.Count == 0)
             {
                 Console.WriteLine("Немає клієнтів. Спочатку додайте клієнта.");
                 return;
             }
 
-            if (меню.Страви.Count == 0)
+            if (menu.Dishes.Count == 0)
             {
                 Console.WriteLine("Меню порожнє. Спочатку додайте страву.");
                 return;
             }
 
-            ПоказатиКлієнтів();
+            ShowCustomers();
 
-            int idКлієнта = ВвестиДодатнеЦіле("\nID клієнта: ");
-            Customer клієнт =
-                клієнти.FirstOrDefault(c => c.Id == idКлієнта);
+            int customerId = EnterPositiveInteger("\nID клієнта: ");
+            Customer customer =
+                customers.FirstOrDefault(c => c.Id == customerId);
 
-            if (клієнт == null)
+            if (customer == null)
             {
                 Console.WriteLine("Клієнта не знайдено.");
                 return;
             }
 
-            меню.Показати();
+            menu.Show();
 
-            int idСтрави = ВвестиДодатнеЦіле("\nID страви: ");
-            Dish страва =
-                меню.Страви.FirstOrDefault(d => d.Id == idСтрави);
+            int dishId = EnterPositiveInteger("\nID страви: ");
+            Dish dish =
+                menu.Dishes.FirstOrDefault(d => d.Id == dishId);
 
-            if (страва == null)
+            if (dish == null)
             {
                 Console.WriteLine("Страву не знайдено.");
                 return;
             }
 
-            int кількість = ВвестиДодатнеЦіле("Кількість: ");
+            int quantity = EnterPositiveInteger("Кількість: ");
 
-            int idЗамовлення = замовлення.Count == 0
+            int orderId = orders.Count == 0
                 ? 1
-                : замовлення.Max(o => o.Id) + 1;
+                : orders.Max(o => o.Id) + 1;
 
-            замовлення.Add(new Order
+            orders.Add(new Order
             {
-                Id = idЗамовлення,
-                ІмяКлієнта = клієнт.Імя,
-                НазваСтрави = страва.Назва,
-                Кількість = кількість,
-                ЗагальнаЦіна = страва.Ціна * кількість
+                Id = orderId,
+                CustomerName = customer.Name,
+                DishName = dish.Name,
+                Quantity = quantity,
+                TotalPrice = dish.Price * quantity,
+                Discount = 0
             });
 
             Console.WriteLine("Замовлення створено.");
         }
 
-        static void ПоказатиЗамовлення()
+        static void ShowOrders()
         {
             Console.WriteLine("\n===== ЗАМОВЛЕННЯ =====");
 
-            if (замовлення.Count == 0)
+            if (orders.Count == 0)
             {
                 Console.WriteLine("Замовлень немає.");
                 return;
             }
 
-            foreach (Order замовленняItem in замовлення)
-                замовленняItem.ПоказатиІнформацію();
+            foreach (Order order in orders)
+                order.ShowInformation();
         }
 
-        static void СкасуватиЗамовлення()
+        static void CancelOrder()
         {
-            ПоказатиЗамовлення();
+            ShowOrders();
 
-            if (замовлення.Count == 0)
+            if (orders.Count == 0)
                 return;
 
-            int id = ВвестиДодатнеЦіле("\nВведіть ID замовлення: ");
+            int id = EnterPositiveInteger("\nВведіть ID замовлення: ");
 
-            Order замовленняДляВидалення =
-                замовлення.FirstOrDefault(o => o.Id == id);
+            Order orderToRemove =
+                orders.FirstOrDefault(o => o.Id == id);
 
-            if (замовленняДляВидалення == null)
+            if (orderToRemove == null)
             {
                 Console.WriteLine("Замовлення не знайдено.");
                 return;
             }
 
-            замовлення.Remove(замовленняДляВидалення);
+            orders.Remove(orderToRemove);
             Console.WriteLine("Замовлення скасовано.");
         }
 
-        static void ЗабронюватиСтолик()
+        static void ReserveTable()
         {
-            ПоказатиСтолики();
+            ShowTables();
 
-            int номер = ВвестиДодатнеЦіле("\nНомер столика: ");
-            Table столик =
-                столики.FirstOrDefault(t => t.Номер == номер);
+            int number = EnterPositiveInteger("\nНомер столика: ");
 
-            if (столик == null)
+            Table table =
+                tables.FirstOrDefault(t => t.Number == number);
+
+            if (table == null)
             {
                 Console.WriteLine("Столик не знайдено.");
                 return;
             }
 
-            столик.Забронювати();
+            if (!table.IsFree)
+            {
+                Console.WriteLine(
+                    "Столик уже заброньований клієнтом: " +
+                    table.ReservedBy);
+                return;
+            }
+
+            if (customers.Count == 0)
+            {
+                Console.WriteLine("Спочатку додайте клієнта.");
+                return;
+            }
+
+            ShowCustomers();
+
+            int customerId = EnterPositiveInteger("\nID клієнта: ");
+
+            Customer customer =
+                customers.FirstOrDefault(c => c.Id == customerId);
+
+            if (customer == null)
+            {
+                Console.WriteLine("Клієнта не знайдено.");
+                return;
+            }
+
+            if (table.Reserve(customer.Name))
+                Console.WriteLine(
+                    "Столик №" + table.Number +
+                    " заброньовано для " + customer.Name + ".");
         }
 
-        static void ПоказатиСтолики()
+        static void ShowTables()
         {
             Console.WriteLine("\n===== СТОЛИКИ =====");
 
-            foreach (Table столик in столики)
-                столик.ПоказатиІнформацію();
+            foreach (Table table in tables)
+                table.ShowInformation();
         }
 
-        // ===== МЕТОДИ ПЕРЕВІРКИ ВВЕДЕННЯ =====
+        static void CancelTableReservation()
+        {
+            ShowTables();
 
-        static string ВвестиНепорожнійТекст(string повідомлення)
+            int number = EnterPositiveInteger(
+                "\nНомер столика для скасування бронювання: ");
+
+            Table table =
+                tables.FirstOrDefault(t => t.Number == number);
+
+            if (table == null)
+            {
+                Console.WriteLine("Столик не знайдено.");
+                return;
+            }
+
+            if (table.IsFree)
+            {
+                Console.WriteLine("Столик вільний.");
+                return;
+            }
+
+            Console.WriteLine(
+                "Бронювання клієнта " + table.ReservedBy + " скасовано.");
+
+            table.CancelReservation();
+        }
+
+        static void ApplyDiscountToOrder()
+        {
+            ShowOrders();
+
+            if (orders.Count == 0)
+                return;
+
+            int id = EnterPositiveInteger("\nID замовлення: ");
+
+            Order order = orders.FirstOrDefault(o => o.Id == id);
+
+            if (order == null)
+            {
+                Console.WriteLine("Замовлення не знайдено.");
+                return;
+            }
+
+            double discount = EnterDiscount("Знижка (%): ");
+
+            order.ApplyDiscount(discount);
+
+            Console.WriteLine(
+                "Знижку " + discount + "% застосовано. " +
+                "Нова сума: " + order.TotalPrice + " грн");
+        }
+
+        // ===== INPUT METHODS =====
+
+        static string EnterNonEmptyText(string message)
         {
             while (true)
             {
-                Console.Write(повідомлення);
-                string значення = Console.ReadLine();
+                Console.Write(message);
+                string value = Console.ReadLine();
 
-                if (!string.IsNullOrWhiteSpace(значення))
-                    return значення.Trim();
+                if (!string.IsNullOrWhiteSpace(value))
+                    return value.Trim();
 
                 Console.WriteLine("Поле не може бути порожнім.");
             }
         }
 
-        static string ВвестиІмя(string повідомлення)
+        static string EnterName(string message)
         {
             while (true)
             {
-                Console.Write(повідомлення);
-                string імя = Console.ReadLine();
+                Console.Write(message);
+                string name = Console.ReadLine();
 
-                if (string.IsNullOrWhiteSpace(імя))
+                if (string.IsNullOrWhiteSpace(name))
                 {
                     Console.WriteLine("Ім'я не може бути порожнім.");
                     continue;
                 }
 
-                bool правильне = імя.All(c =>
+                name = name.Trim();
+
+                bool correct = name.All(c =>
                     char.IsLetter(c) || c == ' ' || c == '-' || c == '\'');
 
-                if (!правильне)
+                if (!correct)
                 {
-                    Console.WriteLine("Ім'я може містити тільки літери, пробіл, дефіс або апостроф.");
+                    Console.WriteLine(
+                        "Ім'я може містити тільки літери, пробіл, дефіс або апостроф.");
                     continue;
                 }
 
-                return імя.Trim();
+                // First letter must be uppercase.
+                if (!char.IsUpper(name[0]))
+                {
+                    Console.WriteLine(
+                        "Перша буква імені повинна бути великою.");
+                    continue;
+                }
+
+                return name;
             }
         }
 
-        static string ВвестиТелефон(string повідомлення)
+        static string EnterPhone(string message)
         {
             while (true)
             {
-                Console.Write(повідомлення);
-                string телефон = Console.ReadLine();
+                Console.Write(message);
+                string phone = Console.ReadLine();
 
-                if (string.IsNullOrWhiteSpace(телефон))
+                if (string.IsNullOrWhiteSpace(phone))
                 {
                     Console.WriteLine("Номер телефону не може бути порожнім.");
                     continue;
                 }
 
-                bool тількиЦифри = телефон.All(char.IsDigit);
+                bool onlyDigits = phone.All(char.IsDigit);
 
-                if (!тількиЦифри)
+                if (!onlyDigits)
                 {
-                    Console.WriteLine("Телефон може містити тільки цифри без пробілів, +, дужок та дефісів.");
+                    Console.WriteLine(
+                        "Телефон може містити тільки цифри без пробілів, +, дужок та дефісів.");
                     continue;
                 }
 
-                if (телефон.Length < 10 || телефон.Length > 15)
+                if (phone.Length < 10 || phone.Length > 15)
                 {
-                    Console.WriteLine("Номер телефону повинен містити від 10 до 15 цифр.");
+                    Console.WriteLine(
+                        "Номер телефону повинен містити від 10 до 15 цифр.");
                     continue;
                 }
 
-                return телефон;
+                return phone;
             }
         }
 
-        static int ВвестиВік(string повідомлення)
+        static int EnterAge(string message)
         {
             while (true)
             {
-                Console.Write(повідомлення);
-                string введення = Console.ReadLine();
-                int вік;
+                Console.Write(message);
+                string input = Console.ReadLine();
+                int age;
 
-                if (!int.TryParse(введення, out вік))
+                if (!int.TryParse(input, out age))
                 {
                     Console.WriteLine("Вік повинен бути цілим числом.");
                     continue;
                 }
 
-                if (вік < 1 || вік > 120)
+                if (age < 1 || age > 120)
                 {
                     Console.WriteLine("Вік повинен бути від 1 до 120 років.");
                     continue;
                 }
 
-                return вік;
+                return age;
             }
         }
 
-        static int ВвестиДодатнеЦіле(string повідомлення)
+        static int EnterPositiveInteger(string message)
         {
             while (true)
             {
-                Console.Write(повідомлення);
-                string введення = Console.ReadLine();
-                int число;
+                Console.Write(message);
+                string input = Console.ReadLine();
+                int number;
 
-                if (!int.TryParse(введення, out число) || число <= 0)
+                if (!int.TryParse(input, out number) || number <= 0)
                 {
                     Console.WriteLine("Введіть ціле число більше 0.");
                     continue;
                 }
 
-                return число;
+                return number;
             }
         }
 
-        static double ВвестиДодатнеЧисло(string повідомлення)
+        static double EnterPositiveNumber(string message)
         {
             while (true)
             {
-                Console.Write(повідомлення);
-                string введення = Console.ReadLine();
-                double число;
+                Console.Write(message);
+                string input = Console.ReadLine();
+                double number;
 
-                if (!double.TryParse(введення, out число) || число <= 0)
+                if (!double.TryParse(input, out number) || number <= 0)
                 {
                     Console.WriteLine("Введіть число більше 0.");
                     continue;
                 }
 
-                return число;
+                return number;
+            }
+        }
+
+        static double EnterDiscount(string message)
+        {
+            while (true)
+            {
+                Console.Write(message);
+                string input = Console.ReadLine();
+                double discount;
+
+                if (!double.TryParse(input, out discount) ||
+                    discount < 0 || discount > 100)
+                {
+                    Console.WriteLine(
+                        "Знижка повинна бути від 0 до 100%.");
+                    continue;
+                }
+
+                return discount;
             }
         }
     }
