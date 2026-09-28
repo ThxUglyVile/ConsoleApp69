@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -72,6 +71,12 @@ namespace RestaurantProgram
         public void Показати()
         {
             Console.WriteLine("\n===== МЕНЮ =====");
+
+            if (Страви.Count == 0)
+            {
+                Console.WriteLine("Меню порожнє.");
+                return;
+            }
 
             foreach (Dish страва in Страви)
                 страва.ПоказатиІнформацію();
@@ -269,7 +274,7 @@ namespace RestaurantProgram
                         return;
 
                     default:
-                        Console.WriteLine("Невірний вибір.");
+                        Console.WriteLine("Невірний вибір. Введіть номер пункту меню від 0 до 11.");
                         break;
                 }
 
@@ -312,7 +317,7 @@ namespace RestaurantProgram
                 Id = 1,
                 Імя = "Михайло",
                 Вік = 21,
-                Телефон = "+380 50 222 33 44"
+                Телефон = "380502223344"
             });
 
             працівники.Add(new Employee
@@ -348,27 +353,15 @@ namespace RestaurantProgram
         {
             Console.WriteLine("\n===== ДОДАВАННЯ СТРАВИ =====");
 
-            Console.Write("Назва: ");
-            string назва = Console.ReadLine();
+            string назва = ВвестиНепорожнійТекст("Назва: ");
+            string категорія = ВвестиНепорожнійТекст("Категорія: ");
+            double ціна = ВвестиДодатнеЧисло("Ціна: ");
+            int вага = ВвестиДодатнеЦіле("Вага (г): ");
 
-            Console.Write("Категорія: ");
-            string категорія = Console.ReadLine();
-
-            Console.Write("Ціна: ");
-            double ціна;
-
-            if (!double.TryParse(Console.ReadLine(), out ціна))
+            if (меню.Страви.Any(d =>
+                d.Назва.Equals(назва, StringComparison.OrdinalIgnoreCase)))
             {
-                Console.WriteLine("Невірна ціна.");
-                return;
-            }
-
-            Console.Write("Вага: ");
-            int вага;
-
-            if (!int.TryParse(Console.ReadLine(), out вага))
-            {
-                Console.WriteLine("Невірна вагааааа тест зміненно.");
+                Console.WriteLine("Страва з такою назвою вже існує.");
                 return;
             }
 
@@ -390,33 +383,26 @@ namespace RestaurantProgram
         {
             меню.Показати();
 
-            Console.Write("\nВведіть ID страви: ");
-            int id;
+            if (меню.Страви.Count == 0)
+                return;
 
-            if (int.TryParse(Console.ReadLine(), out id))
-                меню.ВидалитиСтраву(id);
-            else
-                Console.WriteLine("Невірний ID.");
+            int id = ВвестиДодатнеЦіле("\nВведіть ID страви: ");
+            меню.ВидалитиСтраву(id);
         }
 
         static void ДодатиКлієнта()
         {
             Console.WriteLine("\n===== ДОДАВАННЯ КЛІЄНТА =====");
 
-            Console.Write("Ім'я: ");
-            string імʼя = Console.ReadLine();
+            string імʼя = ВвестиІмя("Ім'я: ");
+            int вік = ВвестиВік("Вік: ");
+            string телефон = ВвестиТелефон("Телефон (тільки цифри): ");
 
-            Console.Write("Вік: ");
-            int вік;
-
-            if (!int.TryParse(Console.ReadLine(), out вік))
+            if (клієнти.Any(c => c.Телефон == телефон))
             {
-                Console.WriteLine("Невірний вік.");
+                Console.WriteLine("Клієнт з таким номером телефону вже існує.");
                 return;
             }
-
-            Console.Write("Телефон: ");
-            string телефон = Console.ReadLine();
 
             int id = клієнти.Count == 0
                 ? 1
@@ -437,6 +423,12 @@ namespace RestaurantProgram
         {
             Console.WriteLine("\n===== КЛІЄНТИ =====");
 
+            if (клієнти.Count == 0)
+            {
+                Console.WriteLine("Клієнтів немає.");
+                return;
+            }
+
             foreach (Customer клієнт in клієнти)
                 клієнт.ПоказатиІнформацію();
         }
@@ -445,17 +437,21 @@ namespace RestaurantProgram
         {
             Console.WriteLine("\n===== СТВОРЕННЯ ЗАМОВЛЕННЯ =====");
 
-            ПоказатиКлієнтів();
-
-            Console.Write("\nID клієнта: ");
-            int idКлієнта;
-
-            if (!int.TryParse(Console.ReadLine(), out idКлієнта))
+            if (клієнти.Count == 0)
             {
-                Console.WriteLine("Невірний ID.");
+                Console.WriteLine("Немає клієнтів. Спочатку додайте клієнта.");
                 return;
             }
 
+            if (меню.Страви.Count == 0)
+            {
+                Console.WriteLine("Меню порожнє. Спочатку додайте страву.");
+                return;
+            }
+
+            ПоказатиКлієнтів();
+
+            int idКлієнта = ВвестиДодатнеЦіле("\nID клієнта: ");
             Customer клієнт =
                 клієнти.FirstOrDefault(c => c.Id == idКлієнта);
 
@@ -467,15 +463,7 @@ namespace RestaurantProgram
 
             меню.Показати();
 
-            Console.Write("\nID страви: ");
-            int idСтрави;
-
-            if (!int.TryParse(Console.ReadLine(), out idСтрави))
-            {
-                Console.WriteLine("Невірний ID.");
-                return;
-            }
-
+            int idСтрави = ВвестиДодатнеЦіле("\nID страви: ");
             Dish страва =
                 меню.Страви.FirstOrDefault(d => d.Id == idСтрави);
 
@@ -485,17 +473,11 @@ namespace RestaurantProgram
                 return;
             }
 
-            Console.Write("Кількість: ");
-            int кількість;
+            int кількість = ВвестиДодатнеЦіле("Кількість: ");
 
-            if (!int.TryParse(Console.ReadLine(), out кількість) ||
-                кількість <= 0)
-            {
-                Console.WriteLine("Невірна кількість.");
-                return;
-            }
-
-            int idЗамовлення = замовлення.Count + 1;
+            int idЗамовлення = замовлення.Count == 0
+                ? 1
+                : замовлення.Max(o => o.Id) + 1;
 
             замовлення.Add(new Order
             {
@@ -519,8 +501,8 @@ namespace RestaurantProgram
                 return;
             }
 
-            foreach (Order замовлення in Program.замовлення)
-                замовлення.ПоказатиІнформацію();
+            foreach (Order замовленняItem in замовлення)
+                замовленняItem.ПоказатиІнформацію();
         }
 
         static void СкасуватиЗамовлення()
@@ -530,14 +512,7 @@ namespace RestaurantProgram
             if (замовлення.Count == 0)
                 return;
 
-            Console.Write("\nВведіть ID замовлення: ");
-            int id;
-
-            if (!int.TryParse(Console.ReadLine(), out id))
-            {
-                Console.WriteLine("Невірний ID.");
-                return;
-            }
+            int id = ВвестиДодатнеЦіле("\nВведіть ID замовлення: ");
 
             Order замовленняДляВидалення =
                 замовлення.FirstOrDefault(o => o.Id == id);
@@ -549,7 +524,6 @@ namespace RestaurantProgram
             }
 
             замовлення.Remove(замовленняДляВидалення);
-
             Console.WriteLine("Замовлення скасовано.");
         }
 
@@ -557,15 +531,7 @@ namespace RestaurantProgram
         {
             ПоказатиСтолики();
 
-            Console.Write("\nНомер столика: ");
-            int номер;
-
-            if (!int.TryParse(Console.ReadLine(), out номер))
-            {
-                Console.WriteLine("Невірний номер.");
-                return;
-            }
-
+            int номер = ВвестиДодатнеЦіле("\nНомер столика: ");
             Table столик =
                 столики.FirstOrDefault(t => t.Номер == номер);
 
@@ -584,6 +550,139 @@ namespace RestaurantProgram
 
             foreach (Table столик in столики)
                 столик.ПоказатиІнформацію();
+        }
+
+        // ===== МЕТОДИ ПЕРЕВІРКИ ВВЕДЕННЯ =====
+
+        static string ВвестиНепорожнійТекст(string повідомлення)
+        {
+            while (true)
+            {
+                Console.Write(повідомлення);
+                string значення = Console.ReadLine();
+
+                if (!string.IsNullOrWhiteSpace(значення))
+                    return значення.Trim();
+
+                Console.WriteLine("Поле не може бути порожнім.");
+            }
+        }
+
+        static string ВвестиІмя(string повідомлення)
+        {
+            while (true)
+            {
+                Console.Write(повідомлення);
+                string імя = Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(імя))
+                {
+                    Console.WriteLine("Ім'я не може бути порожнім.");
+                    continue;
+                }
+
+                bool правильне = імя.All(c =>
+                    char.IsLetter(c) || c == ' ' || c == '-' || c == '\'');
+
+                if (!правильне)
+                {
+                    Console.WriteLine("Ім'я може містити тільки літери, пробіл, дефіс або апостроф.");
+                    continue;
+                }
+
+                return імя.Trim();
+            }
+        }
+
+        static string ВвестиТелефон(string повідомлення)
+        {
+            while (true)
+            {
+                Console.Write(повідомлення);
+                string телефон = Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(телефон))
+                {
+                    Console.WriteLine("Номер телефону не може бути порожнім.");
+                    continue;
+                }
+
+                bool тількиЦифри = телефон.All(char.IsDigit);
+
+                if (!тількиЦифри)
+                {
+                    Console.WriteLine("Телефон може містити тільки цифри без пробілів, +, дужок та дефісів.");
+                    continue;
+                }
+
+                if (телефон.Length < 10 || телефон.Length > 15)
+                {
+                    Console.WriteLine("Номер телефону повинен містити від 10 до 15 цифр.");
+                    continue;
+                }
+
+                return телефон;
+            }
+        }
+
+        static int ВвестиВік(string повідомлення)
+        {
+            while (true)
+            {
+                Console.Write(повідомлення);
+                string введення = Console.ReadLine();
+                int вік;
+
+                if (!int.TryParse(введення, out вік))
+                {
+                    Console.WriteLine("Вік повинен бути цілим числом.");
+                    continue;
+                }
+
+                if (вік < 1 || вік > 120)
+                {
+                    Console.WriteLine("Вік повинен бути від 1 до 120 років.");
+                    continue;
+                }
+
+                return вік;
+            }
+        }
+
+        static int ВвестиДодатнеЦіле(string повідомлення)
+        {
+            while (true)
+            {
+                Console.Write(повідомлення);
+                string введення = Console.ReadLine();
+                int число;
+
+                if (!int.TryParse(введення, out число) || число <= 0)
+                {
+                    Console.WriteLine("Введіть ціле число більше 0.");
+                    continue;
+                }
+
+                return число;
+            }
+        }
+
+        static double ВвестиДодатнеЧисло(string повідомлення)
+        {
+            while (true)
+            {
+                Console.Write(повідомлення);
+                string введення = Console.ReadLine();
+                double число;
+
+                if (!double.TryParse(введення, out число) || число <= 0)
+                {
+                    Console.WriteLine("Введіть число більше 0.");
+                    continue;
+                }
+
+                return число;
+            }
         }
     }
 }
