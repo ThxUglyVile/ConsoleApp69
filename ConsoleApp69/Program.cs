@@ -368,7 +368,7 @@ namespace RestaurantProgram
 
             if (!int.TryParse(Console.ReadLine(), out вага))
             {
-                Console.WriteLine("Невірна вага.");
+                Console.WriteLine("Невірна вагааааа тест зміненно.");
                 return;
             }
 
