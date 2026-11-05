@@ -1,16 +1,16 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace RestaurantProgram
 {
-
     public enum ConsoleOption
     {
         ShowMenu,
-        GetOrder,
-
+        GetOrder
     }
+
     class Program
     {
         static Restaurant restaurant = new Restaurant
@@ -22,6 +22,7 @@ namespace RestaurantProgram
         };
 
         static Menu menu = new Menu { Name = "Основне меню" };
+
         static List<Customer> customers = new List<Customer>();
         static List<Order> orders = new List<Order>();
         static List<Table> tables = new List<Table>();
@@ -58,20 +59,52 @@ namespace RestaurantProgram
 
                 switch (choice)
                 {
-                    case "1": restaurant.ShowInformation(); Pause(); break;
-                    case "2": menu.Show(); Pause(); break;
-                    case "3": AddDish(); break;
-                    case "4": RemoveDish(); break;
-                    case "5": AddCustomer(); break;
-                    case "6": ShowCustomers(); Pause(); break;
-                    case "7": CreateOrder(); break;
-                    case "8": ShowOrders(); Pause(); break;
-                    case "9": CancelOrder(); break;
-                    case "10": ReserveTable(); break;
-                    case "11": ShowTables(); Pause(); break;
-                    case "12": CancelTableReservation(); break;
-                    case "13": ManageDiscount(); break;
-                    case "0": return;
+                    case "1":
+                        restaurant.ShowInformation();
+                        Pause();
+                        break;
+                    case "2":
+                        menu.Show();
+                        Pause();
+                        break;
+                    case "3":
+                        AddDish();
+                        break;
+                    case "4":
+                        RemoveDish();
+                        break;
+                    case "5":
+                        AddCustomer();
+                        break;
+                    case "6":
+                        ShowCustomers();
+                        Pause();
+                        break;
+                    case "7":
+                        CreateOrder();
+                        break;
+                    case "8":
+                        ShowOrders();
+                        Pause();
+                        break;
+                    case "9":
+                        CancelOrder();
+                        break;
+                    case "10":
+                        ReserveTable();
+                        break;
+                    case "11":
+                        ShowTables();
+                        Pause();
+                        break;
+                    case "12":
+                        CancelTableReservation();
+                        break;
+                    case "13":
+                        ManageDiscount();
+                        break;
+                    case "0":
+                        return;
                     default:
                         Console.WriteLine("Невірний вибір.");
                         Pause();
@@ -82,9 +115,41 @@ namespace RestaurantProgram
 
         static void InitializeData()
         {
-            menu.AddDish(new Dish { Id = 1, Name = "Маргарита", Category = "Піца", Price = 250, Weight = 500 });
-            menu.AddDish(new Dish { Id = 2, Name = "Пепероні", Category = "Піца", Price = 300, Weight = 550 });
-            menu.AddDish(new Dish { Id = 3, Name = "Карбонара", Category = "Паста", Price = 220, Weight = 350 });
+            menu.AddDish(new Dish
+            {
+                Id = 1,
+                Name = "Маргарита",
+                Category = "Піца",
+                Price = 250,
+                Weight = 500
+            });
+
+            menu.AddDish(new Dish
+            {
+                Id = 2,
+                Name = "Пепероні",
+                Category = "Піца",
+                Price = 300,
+                Weight = 550
+            });
+
+            menu.AddDish(new Dish
+            {
+                Id = 3,
+                Name = "Карбонара",
+                Category = "Паста",
+                Price = 220,
+                Weight = 350
+            });
+
+            menu.AddDish(new Drink(
+                4, "Лимонад", "Напої", 80, 300, true));
+
+            menu.AddDish(new Drink(
+                5, "Капучино", "Напої", 95, 250, false));
+
+            menu.AddDish(new Drink(
+                6, "Айс-лате", "Напої", 110, 350, true));
 
             customers.Add(new Customer
             {
@@ -95,6 +160,7 @@ namespace RestaurantProgram
             });
 
             for (int i = 1; i <= 5; i++)
+            {
                 tables.Add(new Table
                 {
                     Number = i,
@@ -102,6 +168,7 @@ namespace RestaurantProgram
                     IsFree = true,
                     ReservedBy = ""
                 });
+            }
         }
 
         static void AddDish()
@@ -121,14 +188,18 @@ namespace RestaurantProgram
             int weight = EnterPositiveInteger("Вага (г): ");
             if (weight == -1) return;
 
-            if (menu.Dishes.Any(d => d.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
+            if (menu.Dishes.Any(d =>
+                d.Name.Equals(name, StringComparison.OrdinalIgnoreCase)))
             {
                 Console.WriteLine("Страва з такою назвою вже існує.");
                 Pause();
                 return;
             }
 
-            int id = menu.Dishes.Count == 0 ? 1 : menu.Dishes.Max(d => d.Id) + 1;
+            int id = menu.Dishes.Count == 0
+                ? 1
+                : menu.Dishes.Max(d => d.Id) + 1;
+
             menu.AddDish(new Dish
             {
                 Id = id,
@@ -137,13 +208,19 @@ namespace RestaurantProgram
                 Price = price,
                 Weight = weight
             });
+
             Pause();
         }
 
         static void RemoveDish()
         {
             menu.Show();
-            if (menu.Dishes.Count == 0) { Pause(); return; }
+
+            if (menu.Dishes.Count == 0)
+            {
+                Pause();
+                return;
+            }
 
             int id = EnterPositiveInteger("\nID страви (0 — назад): ");
             if (id == -1) return;
@@ -168,13 +245,24 @@ namespace RestaurantProgram
 
             if (customers.Any(c => c.Phone == phone))
             {
-                Console.WriteLine("Клієнт з таким номером телефону вже існує.");
+                Console.WriteLine(
+                    "Клієнт з таким номером телефону вже існує.");
                 Pause();
                 return;
             }
 
-            int id = customers.Count == 0 ? 1 : customers.Max(c => c.Id) + 1;
-            customers.Add(new Customer { Id = id, Name = name, Age = age, Phone = phone });
+            int id = customers.Count == 0
+                ? 1
+                : customers.Max(c => c.Id) + 1;
+
+            customers.Add(new Customer
+            {
+                Id = id,
+                Name = name,
+                Age = age,
+                Phone = phone
+            });
+
             Console.WriteLine("Клієнта додано.");
             Pause();
         }
@@ -182,6 +270,7 @@ namespace RestaurantProgram
         static void ShowCustomers()
         {
             Console.WriteLine("\n===== КЛІЄНТИ =====");
+
             if (customers.Count == 0)
             {
                 Console.WriteLine("Клієнтів немає.");
@@ -189,36 +278,75 @@ namespace RestaurantProgram
             }
 
             foreach (Customer customer in customers)
+            {
                 customer.ShowInformation();
+            }
         }
 
         static void CreateOrder()
         {
             Console.WriteLine("\n===== СТВОРЕННЯ ЗАМОВЛЕННЯ =====");
-            if (customers.Count == 0) { Console.WriteLine("Спочатку додайте клієнта."); Pause(); return; }
-            if (menu.Dishes.Count == 0) { Console.WriteLine("Меню порожнє."); Pause(); return; }
+
+            if (customers.Count == 0)
+            {
+                Console.WriteLine("Спочатку додайте клієнта.");
+                Pause();
+                return;
+            }
+
+            if (menu.Dishes.Count == 0)
+            {
+                Console.WriteLine("Меню порожнє.");
+                Pause();
+                return;
+            }
 
             ShowCustomers();
-            int customerId = EnterPositiveInteger("\nID клієнта (0 — назад): ");
+
+            int customerId = EnterPositiveInteger(
+                "\nID клієнта (0 — назад): ");
+
             if (customerId == -1) return;
 
-            Customer customer = customers.FirstOrDefault(c => c.Id == customerId);
-            if (customer == null) { Console.WriteLine("Клієнта не знайдено."); Pause(); return; }
+            Customer customer = customers.FirstOrDefault(
+                c => c.Id == customerId);
+
+            if (customer == null)
+            {
+                Console.WriteLine("Клієнта не знайдено.");
+                Pause();
+                return;
+            }
 
             menu.Show();
-            int dishId = EnterPositiveInteger("\nID страви (0 — назад): ");
+
+            int dishId = EnterPositiveInteger(
+                "\nID страви (0 — назад): ");
+
             if (dishId == -1) return;
 
-            Dish dish = menu.Dishes.FirstOrDefault(d => d.Id == dishId);
-            if (dish == null) { Console.WriteLine("Страву не знайдено."); Pause(); return; }
+            Dish dish = menu.Dishes.FirstOrDefault(
+                d => d.Id == dishId);
 
-            int quantity = EnterPositiveInteger("Кількість (0 — назад): ");
+            if (dish == null)
+            {
+                Console.WriteLine("Страву не знайдено.");
+                Pause();
+                return;
+            }
+
+            int quantity = EnterPositiveInteger(
+                "Кількість (0 — назад): ");
+
             if (quantity == -1) return;
 
             double total = dish.Price * quantity;
-            int id = orders.Count == 0 ? 1 : orders.Max(o => o.Id) + 1;
 
-            orders.Add(new Order
+            int id = orders.Count == 0
+                ? 1
+                : orders.Max(o => o.Id) + 1;
+
+            Order order = new Order
             {
                 Id = id,
                 CustomerName = customer.Name,
@@ -227,32 +355,58 @@ namespace RestaurantProgram
                 OriginalTotalPrice = total,
                 TotalPrice = total,
                 Discount = 0
-            });
+            };
+
+            orders.Add(order);
 
             Console.WriteLine("Замовлення створено.");
+
+            ChoosePayment(order);
             Pause();
         }
 
         static void ShowOrders()
         {
             Console.WriteLine("\n===== ЗАМОВЛЕННЯ =====");
-            if (orders.Count == 0) { Console.WriteLine("Замовлень немає."); return; }
+
+            if (orders.Count == 0)
+            {
+                Console.WriteLine("Замовлень немає.");
+                return;
+            }
 
             foreach (Order order in orders)
+            {
                 order.ShowInformation();
+            }
         }
 
         static void CancelOrder()
         {
             ShowOrders();
-            if (orders.Count == 0) { Pause(); return; }
 
-            int id = EnterPositiveInteger("\nID замовлення (0 — назад): ");
+            if (orders.Count == 0)
+            {
+                Pause();
+                return;
+            }
+
+            int id = EnterPositiveInteger(
+                "\nID замовлення (0 — назад): ");
+
             if (id == -1) return;
 
             Order order = orders.FirstOrDefault(o => o.Id == id);
-            if (order == null) Console.WriteLine("Замовлення не знайдено.");
-            else { orders.Remove(order); Console.WriteLine("Замовлення скасовано."); }
+
+            if (order == null)
+            {
+                Console.WriteLine("Замовлення не знайдено.");
+            }
+            else
+            {
+                orders.Remove(order);
+                Console.WriteLine("Замовлення скасовано.");
+            }
 
             Pause();
         }
@@ -260,29 +414,57 @@ namespace RestaurantProgram
         static void ReserveTable()
         {
             ShowTables();
-            int number = EnterPositiveInteger("\nНомер столика (0 — назад): ");
+
+            int number = EnterPositiveInteger(
+                "\nНомер столика (0 — назад): ");
+
             if (number == -1) return;
 
-            Table table = tables.FirstOrDefault(t => t.Number == number);
-            if (table == null) { Console.WriteLine("Столик не знайдено."); Pause(); return; }
+            Table table = tables.FirstOrDefault(
+                t => t.Number == number);
 
-            if (!table.IsFree)
+            if (table == null)
             {
-                Console.WriteLine("Столик вже заброньований клієнтом: " + table.ReservedBy);
+                Console.WriteLine("Столик не знайдено.");
                 Pause();
                 return;
             }
 
-            if (customers.Count == 0) { Console.WriteLine("Спочатку додайте клієнта."); Pause(); return; }
+            if (!table.IsFree)
+            {
+                Console.WriteLine(
+                    "Столик вже заброньований клієнтом: " +
+                    table.ReservedBy);
+                Pause();
+                return;
+            }
+
+            if (customers.Count == 0)
+            {
+                Console.WriteLine("Спочатку додайте клієнта.");
+                Pause();
+                return;
+            }
 
             ShowCustomers();
-            int customerId = EnterPositiveInteger("\nID клієнта (0 — назад): ");
+
+            int customerId = EnterPositiveInteger(
+                "\nID клієнта (0 — назад): ");
+
             if (customerId == -1) return;
 
-            Customer customer = customers.FirstOrDefault(c => c.Id == customerId);
-            if (customer == null) Console.WriteLine("Клієнта не знайдено.");
+            Customer customer = customers.FirstOrDefault(
+                c => c.Id == customerId);
+
+            if (customer == null)
+            {
+                Console.WriteLine("Клієнта не знайдено.");
+            }
             else if (table.Reserve(customer.Name))
-                Console.WriteLine($"Столик №{table.Number} заброньовано для {customer.Name}.");
+            {
+                Console.WriteLine(
+                    $"Столик №{table.Number} заброньовано для {customer.Name}.");
+            }
 
             Pause();
         }
@@ -290,22 +472,38 @@ namespace RestaurantProgram
         static void ShowTables()
         {
             Console.WriteLine("\n===== СТОЛИКИ =====");
+
             foreach (Table table in tables)
+            {
                 table.ShowInformation();
+            }
         }
 
         static void CancelTableReservation()
         {
             ShowTables();
-            int number = EnterPositiveInteger("\nНомер столика (0 — назад): ");
+
+            int number = EnterPositiveInteger(
+                "\nНомер столика (0 — назад): ");
+
             if (number == -1) return;
 
-            Table table = tables.FirstOrDefault(t => t.Number == number);
-            if (table == null) Console.WriteLine("Столик не знайдено.");
-            else if (table.IsFree) Console.WriteLine("Столик вільний.");
+            Table table = tables.FirstOrDefault(
+                t => t.Number == number);
+
+            if (table == null)
+            {
+                Console.WriteLine("Столик не знайдено.");
+            }
+            else if (table.IsFree)
+            {
+                Console.WriteLine("Столик вільний.");
+            }
             else
             {
-                Console.WriteLine($"Бронювання клієнта {table.ReservedBy} скасовано.");
+                Console.WriteLine(
+                    $"Бронювання клієнта {table.ReservedBy} скасовано.");
+
                 table.CancelReservation();
             }
 
@@ -315,13 +513,26 @@ namespace RestaurantProgram
         static void ManageDiscount()
         {
             ShowOrders();
-            if (orders.Count == 0) { Pause(); return; }
 
-            int id = EnterPositiveInteger("\nID замовлення (0 — назад): ");
+            if (orders.Count == 0)
+            {
+                Pause();
+                return;
+            }
+
+            int id = EnterPositiveInteger(
+                "\nID замовлення (0 — назад): ");
+
             if (id == -1) return;
 
             Order order = orders.FirstOrDefault(o => o.Id == id);
-            if (order == null) { Console.WriteLine("Замовлення не знайдено."); Pause(); return; }
+
+            if (order == null)
+            {
+                Console.WriteLine("Замовлення не знайдено.");
+                Pause();
+                return;
+            }
 
             Console.WriteLine("\n1. Встановити знижку");
             Console.WriteLine("2. Збільшити знижку");
@@ -331,6 +542,7 @@ namespace RestaurantProgram
             Console.Write("Оберіть дію: ");
 
             string choice = Console.ReadLine();
+
             if (choice == "0") return;
 
             if (choice == "4")
@@ -338,30 +550,42 @@ namespace RestaurantProgram
                 order.ApplyDiscount(0);
                 Console.WriteLine("Знижку повністю скасовано.");
             }
-            else if (choice == "1" || choice == "2" || choice == "3")
+            else if (choice == "1" ||
+                     choice == "2" ||
+                     choice == "3")
             {
-                double value = EnterDiscount("Відсоток (0 — назад): ");
+                double value = EnterDiscount(
+                    "Відсоток (0 — назад): ");
+
                 if (value == -1) return;
 
-                double newDiscount = choice == "1" ? value :
-                    choice == "2" ? order.Discount + value : order.Discount - value;
+                double newDiscount =
+                    choice == "1" ? value :
+                    choice == "2" ? order.Discount + value :
+                    order.Discount - value;
 
                 if (newDiscount < 0 || newDiscount > 100)
                 {
-                    Console.WriteLine("Знижка повинна бути від 0 до 100%.");
+                    Console.WriteLine(
+                        "Знижка повинна бути від 0 до 100%.");
                 }
                 else
                 {
                     order.ApplyDiscount(newDiscount);
-                    Console.WriteLine($"Знижка: {order.Discount}%. До сплати: {order.TotalPrice:F2} грн");
+
+                    Console.WriteLine(
+                        $"Знижка: {order.Discount}%. " +
+                        $"До сплати: {order.TotalPrice:F2} грн");
                 }
             }
-            else Console.WriteLine("Невірний вибір.");
+            else
+            {
+                Console.WriteLine("Невірний вибір.");
+            }
 
             Pause();
         }
 
-        // Текст: тільки літери та пробіли, перша буква велика.
         static string EnterText(string message)
         {
             while (true)
@@ -370,13 +594,16 @@ namespace RestaurantProgram
                 string value = Console.ReadLine()?.Trim();
 
                 if (value == "0") return null;
+
                 if (string.IsNullOrWhiteSpace(value))
                 {
                     Console.WriteLine("Поле не може бути порожнім.");
                     continue;
                 }
 
-                bool lettersOnly = value.All(c => char.IsLetter(c) || c == ' ');
+                bool lettersOnly = value.All(
+                    c => char.IsLetter(c) || c == ' ');
+
                 if (!lettersOnly)
                 {
                     Console.WriteLine("Можна вводити тільки текст.");
@@ -385,7 +612,8 @@ namespace RestaurantProgram
 
                 if (!char.IsUpper(value[0]))
                 {
-                    Console.WriteLine("Перша буква повинна бути великою.");
+                    Console.WriteLine(
+                        "Перша буква повинна бути великою.");
                     continue;
                 }
 
@@ -393,7 +621,10 @@ namespace RestaurantProgram
             }
         }
 
-        static string EnterName(string message) => EnterText(message);
+        static string EnterName(string message)
+        {
+            return EnterText(message);
+        }
 
         static string EnterPhone(string message)
         {
@@ -403,10 +634,17 @@ namespace RestaurantProgram
                 string phone = Console.ReadLine()?.Trim();
 
                 if (phone == "0") return null;
-                if (phone.All(char.IsDigit) && phone.Length >= 10 && phone.Length <= 15)
-                    return phone;
 
-                Console.WriteLine("Телефон: тільки 10–15 цифр.");
+                if (phone != null &&
+                    phone.All(char.IsDigit) &&
+                    phone.Length >= 10 &&
+                    phone.Length <= 15)
+                {
+                    return phone;
+                }
+
+                Console.WriteLine(
+                    "Телефон: тільки 10–15 цифр.");
             }
         }
 
@@ -418,8 +656,12 @@ namespace RestaurantProgram
                 string input = Console.ReadLine();
 
                 if (input == "0") return -1;
-                if (int.TryParse(input, out int age) && age >= 1 && age <= 120)
+
+                if (int.TryParse(input, out int age) &&
+                    age >= 1 && age <= 120)
+                {
                     return age;
+                }
 
                 Console.WriteLine("Введіть вік від 1 до 120.");
             }
@@ -433,10 +675,15 @@ namespace RestaurantProgram
                 string input = Console.ReadLine();
 
                 if (input == "0") return -1;
-                if (int.TryParse(input, out int number) && number > 0)
-                    return number;
 
-                Console.WriteLine("Введіть ціле число більше 0.");
+                if (int.TryParse(input, out int number) &&
+                    number > 0)
+                {
+                    return number;
+                }
+
+                Console.WriteLine(
+                    "Введіть ціле число більше 0.");
             }
         }
 
@@ -448,8 +695,14 @@ namespace RestaurantProgram
                 string input = Console.ReadLine();
 
                 if (input == "0") return -1;
-                if (double.TryParse(input, out double number) && number > 0)
+
+                if (double.TryParse(input, out double number) &&
+                    number > 0 &&
+                    !double.IsNaN(number) &&
+                    !double.IsInfinity(number))
+                {
                     return number;
+                }
 
                 Console.WriteLine("Введіть число більше 0.");
             }
@@ -463,11 +716,16 @@ namespace RestaurantProgram
                 string input = Console.ReadLine();
 
                 if (input == "0") return -1;
-                if (double.TryParse(input, out double discount) &&
-                    discount >= 0 && discount <= 100)
-                    return discount;
 
-                Console.WriteLine("Введіть відсоток від 0 до 100.");
+                if (double.TryParse(input, out double discount) &&
+                    discount >= 0 &&
+                    discount <= 100)
+                {
+                    return discount;
+                }
+
+                Console.WriteLine(
+                    "Введіть відсоток від 0 до 100.");
             }
         }
 
@@ -475,6 +733,52 @@ namespace RestaurantProgram
         {
             Console.WriteLine("\nНатисніть Enter...");
             Console.ReadLine();
+        }
+
+        static void ChoosePayment(Order order)
+        {
+            Console.WriteLine(
+                "\n===== ОПЛАТА ЗАМОВЛЕННЯ =====");
+
+            Console.WriteLine(
+                $"Сума до сплати: {order.TotalPrice:F2} грн");
+
+            Console.WriteLine("1. Готівка");
+            Console.WriteLine("2. Банківська картка");
+            Console.WriteLine("0. Оплатити пізніше");
+
+            while (true)
+            {
+                Console.Write("Оберіть спосіб оплати: ");
+                string choice = Console.ReadLine();
+
+                IPaymentMethod payment;
+
+                switch (choice)
+                {
+                    case "1":
+                        payment = new CashPayment();
+                        break;
+
+                    case "2":
+                        payment = new CardPayment();
+                        break;
+
+                    case "0":
+                        Console.WriteLine(
+                            "Замовлення залишилось неоплаченим.");
+                        return;
+
+                    default:
+                        Console.WriteLine(
+                            "Невірний вибір. Спробуйте ще раз.");
+                        continue;
+                }
+
+                order.SetPaymentMethod(payment);
+                order.ProcessPayment();
+                return;
+            }
         }
     }
 }
