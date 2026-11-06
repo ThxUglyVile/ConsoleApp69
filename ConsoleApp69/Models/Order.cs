@@ -3,7 +3,7 @@ using System;
 
 namespace RestaurantProgram
 {
-    class Order
+    public class Order
     {
         // Інкапсуляція
         private int quantity = 1;

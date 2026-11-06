@@ -2,6 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using RestaurantProgram.Services;
 
 namespace RestaurantProgram
 {
@@ -27,9 +31,46 @@ namespace RestaurantProgram
         static List<Order> orders = new List<Order>();
         static List<Table> tables = new List<Table>();
 
-        static void Main()
+        static ILogger? logger;
+        static IFileDataService? fileData;
+
+        static void Main(string[] args)
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
+            using var services = new ServiceCollection()
+                .AddLogging(builder => builder.AddProvider(new FileLoggerProvider("logs/restaurant.log")))
+                .AddSingleton<IFileDataService, FileDataService>()
+                .BuildServiceProvider();
+            logger = services.GetRequiredService<ILogger<Program>>();
+            fileData = services.GetRequiredService<IFileDataService>();
+            try
+            {
+                // --input commands.txt подає рядки як консольне введення; --output report.txt зберігає звіт.
+                var inputIndex = Array.IndexOf(args, "--input");
+                if (inputIndex >= 0 && inputIndex + 1 < args.Length)
+                {
+                    var originalInput = Console.In;
+                    using var reader = new StringReader(string.Join(Environment.NewLine,
+                        fileData.ReadLines(args[inputIndex + 1])));
+                    Console.SetIn(reader);
+                    RunApplication();
+                    Console.SetIn(originalInput);
+                }
+                else RunApplication();
+
+                var outputIndex = Array.IndexOf(args, "--output");
+                if (outputIndex >= 0 && outputIndex + 1 < args.Length)
+                    fileData.WriteAllText(args[outputIndex + 1], BuildReport());
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Помилка виконання програми");
+                Console.Error.WriteLine($"Помилка: {ex.Message}");
+            }
+        }
+
+        static void RunApplication()
+        {
             InitializeData();
 
             while (true)
@@ -56,6 +97,7 @@ namespace RestaurantProgram
 
                 Console.Write("Оберіть дію: ");
                 string choice = Console.ReadLine();
+                logger?.LogInformation("Користувач обрав пункт меню {Choice}", choice);
 
                 switch (choice)
                 {
@@ -104,6 +146,7 @@ namespace RestaurantProgram
                         ManageDiscount();
                         break;
                     case "0":
+                        logger?.LogInformation("Завершення роботи програми");
                         return;
                     default:
                         Console.WriteLine("Невірний вибір.");
@@ -111,6 +154,27 @@ namespace RestaurantProgram
                         break;
                 }
             }
+        }
+
+        static string BuildReport()
+        {
+            var report = new StringBuilder();
+            report.AppendLine("ЗВІТ LA PIAZZA");
+            report.AppendLine($"Страв у меню: {menu.Dishes.Count}");
+            report.AppendLine($"Клієнтів: {customers.Count}");
+            report.AppendLine($"Замовлень: {orders.Count}");
+            report.AppendLine($"Столиків: {tables.Count}");
+            report.AppendLine("Страви:");
+            foreach (var dish in menu.Dishes)
+                report.AppendLine($"{dish.Id};{dish.Name};{dish.Category};{dish.Price};{dish.Weight}");
+            report.AppendLine("Клієнти:");
+            foreach (var customer in customers)
+                report.AppendLine($"{customer.Id};{customer.Name};{customer.Age};{customer.Phone}");
+            report.AppendLine("Замовлення:");
+            foreach (var order in orders)
+                report.AppendLine($"{order.Id};{order.CustomerName};{order.DishName};{order.Quantity};{order.TotalPrice}");
+            logger?.LogInformation("Результат експортовано у файл");
+            return report.ToString();
         }
 
         static void InitializeData()

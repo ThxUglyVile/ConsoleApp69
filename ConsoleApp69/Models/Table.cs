@@ -3,7 +3,7 @@ using System;
 
 namespace RestaurantProgram
 {
-    class Table
+    public class Table
     {
         // Закриті поля
         private int number;

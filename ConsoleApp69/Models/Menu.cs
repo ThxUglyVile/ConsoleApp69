@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace RestaurantProgram
 {
-    class Menu
+    public class Menu
     {
         // Інкапсуляція
         private string name = "";

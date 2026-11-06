@@ -3,7 +3,7 @@ using System;
 
 namespace RestaurantProgram
 {
-    class Dish
+    public class Dish
     {
         private string name = "";
         private double price;

@@ -4,14 +4,14 @@ using System;
 namespace RestaurantProgram
 {
     // Інтерфейс визначає спільний контракт оплати
-    interface IPaymentMethod
+    public interface IPaymentMethod
     {
         bool Pay(double amount);
         string GetPaymentInfo();
     }
 
     // Оплата готівкою
-    class CashPayment : IPaymentMethod
+    public class CashPayment : IPaymentMethod
     {
         public bool Pay(double amount)
         {
@@ -35,7 +35,7 @@ namespace RestaurantProgram
     }
 
     // Оплата банківською карткою
-    class CardPayment : IPaymentMethod
+    public class CardPayment : IPaymentMethod
     {
         public bool Pay(double amount)
         {
