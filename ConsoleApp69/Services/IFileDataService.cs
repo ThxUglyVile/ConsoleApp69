@@ -1,6 +1,6 @@
 namespace RestaurantProgram.Services;
 
-/// <summary>Файловий ввід та вивід для команд і звітів ресторану.</summary>
+/// <summary>Файлове введення та виведення команд і звітів ресторану.</summary>
 public interface IFileDataService
 {
     string[] ReadLines(string path);

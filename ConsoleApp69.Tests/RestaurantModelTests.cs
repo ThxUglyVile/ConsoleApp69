@@ -8,8 +8,8 @@ public class RestaurantModelTests
     [Fact]
     public void MenuFindsDishById()
     {
-        var menu = new Menu("Тестове меню");
-        var dish = new Dish(1, "Борщ", "Перше", 120, 350);
+        var menu = new Menu("Test menu");
+        var dish = new Dish(1, "Borshch", "First course", 120, 350);
         menu.AddDish(dish);
         Assert.Same(dish, menu.FindDish(1));
     }
@@ -19,7 +19,7 @@ public class RestaurantModelTests
     {
         var order = new Order
         {
-            Id = 1, CustomerName = "Іван", DishName = "Борщ",
+            Id = 1, CustomerName = "Ivan", DishName = "Borshch",
             Quantity = 2, OriginalTotalPrice = 200
         };
         order.ApplyDiscount(25);
@@ -31,7 +31,7 @@ public class RestaurantModelTests
     public void TableReservationCanBeCancelled()
     {
         var table = new Table(1, 4);
-        Assert.True(table.Reserve("Іван", 3));
+        Assert.True(table.Reserve("Ivan", 3));
         Assert.False(table.IsFree);
         table.CancelReservation();
         Assert.True(table.IsFree);
