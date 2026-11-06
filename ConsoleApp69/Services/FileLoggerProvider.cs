@@ -2,7 +2,7 @@ using Microsoft.Extensions.Logging;
 
 namespace RestaurantProgram.Services;
 
-/// <summary>Провайдер ILogger, який записує події в окремий файл.</summary>
+/// <summary>ILogger provider that appends events to a file.</summary>
 public sealed class FileLoggerProvider(string path) : ILoggerProvider
 {
     private readonly object gate = new();

@@ -1,0 +1,21 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "La Piazza (JSON + report)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build ConsoleApp69",
+      "program": "${workspaceFolder}/ConsoleApp69/bin/Debug/net10.0/ConsoleApp69.dll",
+      "args": [
+        "--data",
+        "${workspaceFolder}/ConsoleApp69/data/restaurant.json",
+        "--output",
+        "${workspaceFolder}/report.txt"
+      ],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal",
+      "stopAtEntry": false
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 using RestaurantProgram;
+using RestaurantProgram.Services;
 using Xunit;
 
 namespace RestaurantProgram.Tests;
@@ -35,5 +36,26 @@ public class RestaurantModelTests
         Assert.False(table.IsFree);
         table.CancelReservation();
         Assert.True(table.IsFree);
+    }
+
+    [Fact]
+    public void FileDataServiceReadsRestaurantDataFromJson()
+    {
+        var path = Path.Combine(Path.GetTempPath(), $"restaurant-{Guid.NewGuid():N}.json");
+        File.WriteAllText(path, """
+            { "dishes": [{ "id": 7, "name": "Soup", "category": "First", "price": 90, "weight": 300 }] }
+            """);
+
+        try
+        {
+            var data = new FileDataService().ReadRestaurantData(path);
+            Assert.Single(data.Dishes);
+            Assert.Equal("Soup", data.Dishes[0].Name);
+            Assert.Equal(90, data.Dishes[0].Price);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
     }
 }

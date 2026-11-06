@@ -31,51 +31,42 @@ namespace RestaurantProgram
         static List<Order> orders = new List<Order>();
         static List<Table> tables = new List<Table>();
 
-        static ILogger? logger;
-        static IFileDataService? fileData;
-
         static void Main(string[] args)
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
             using var services = new ServiceCollection()
-                .AddLogging(builder => builder.AddProvider(new FileLoggerProvider("logs/restaurant.log")))
+                .AddLogging(builder => builder.AddProvider(new FileLoggerProvider(
+                    Path.Combine(GetWorkspaceRoot(), "logs", "restaurant.log"))))
                 .AddSingleton<IFileDataService, FileDataService>()
+                .AddSingleton<IRestaurantApplication, RestaurantApplication>()
                 .BuildServiceProvider();
-            logger = services.GetRequiredService<ILogger<Program>>();
-            fileData = services.GetRequiredService<IFileDataService>();
-            try
-            {
-                // --input commands.txt подає рядки як консольне введення; --output report.txt зберігає звіт.
-                var inputIndex = Array.IndexOf(args, "--input");
-                if (inputIndex >= 0 && inputIndex + 1 < args.Length)
-                {
-                    var originalInput = Console.In;
-                    using var reader = new StringReader(string.Join(Environment.NewLine,
-                        fileData.ReadLines(args[inputIndex + 1])));
-                    Console.SetIn(reader);
-                    RunApplication();
-                    Console.SetIn(originalInput);
-                }
-                else RunApplication();
-
-                var outputIndex = Array.IndexOf(args, "--output");
-                if (outputIndex >= 0 && outputIndex + 1 < args.Length)
-                    fileData.WriteAllText(args[outputIndex + 1], BuildReport());
-            }
-            catch (Exception ex)
-            {
-                logger.LogError(ex, "Помилка виконання програми");
-                Console.Error.WriteLine($"Помилка: {ex.Message}");
-            }
+            services.GetRequiredService<IRestaurantApplication>().Run(args);
         }
 
-        static void RunApplication()
+        internal static string GetWorkspaceRoot()
         {
-            InitializeData();
+            foreach (var startPath in new[] { Directory.GetCurrentDirectory(), AppContext.BaseDirectory })
+            {
+                for (DirectoryInfo? directory = new DirectoryInfo(startPath);
+                     directory is not null;
+                     directory = directory.Parent)
+                {
+                    if (File.Exists(Path.Combine(directory.FullName, "ConsoleApp69.slnx")))
+                        return directory.FullName;
+                }
+            }
+
+            return Directory.GetCurrentDirectory();
+        }
+
+        internal static void RunApplication(ILogger logger, RestaurantData? initialData)
+        {
+            InitializeData(initialData);
 
             while (true)
             {
-                Console.Clear();
+                if (!Console.IsOutputRedirected)
+                    Console.Clear();
                 Console.WriteLine("==========================");
                 Console.WriteLine("       LA PIAZZA");
                 Console.WriteLine("==========================");
@@ -96,8 +87,13 @@ namespace RestaurantProgram
                 Console.WriteLine("==========================");
 
                 Console.Write("Оберіть дію: ");
-                string choice = Console.ReadLine();
-                logger?.LogInformation("Користувач обрав пункт меню {Choice}", choice);
+                string? choice = Console.ReadLine();
+                if (choice is null)
+                {
+                    logger.LogInformation("Вхідний потік завершився; роботу програми зупинено");
+                    return;
+                }
+                logger.LogInformation("Користувач обрав пункт меню {Choice}", choice);
 
                 switch (choice)
                 {
@@ -146,7 +142,7 @@ namespace RestaurantProgram
                         ManageDiscount();
                         break;
                     case "0":
-                        logger?.LogInformation("Завершення роботи програми");
+                        logger.LogInformation("Завершення роботи програми");
                         return;
                     default:
                         Console.WriteLine("Невірний вибір.");
@@ -156,7 +152,7 @@ namespace RestaurantProgram
             }
         }
 
-        static string BuildReport()
+        internal static string BuildReport()
         {
             var report = new StringBuilder();
             report.AppendLine("ЗВІТ LA PIAZZA");
@@ -164,6 +160,9 @@ namespace RestaurantProgram
             report.AppendLine($"Клієнтів: {customers.Count}");
             report.AppendLine($"Замовлень: {orders.Count}");
             report.AppendLine($"Столиків: {tables.Count}");
+            report.AppendLine("Столики:");
+            foreach (var table in tables)
+                report.AppendLine($"{table.Number};{table.Seats};{(table.IsFree ? "Вільний" : table.ReservedBy)}");
             report.AppendLine("Страви:");
             foreach (var dish in menu.Dishes)
                 report.AppendLine($"{dish.Id};{dish.Name};{dish.Category};{dish.Price};{dish.Weight}");
@@ -173,12 +172,27 @@ namespace RestaurantProgram
             report.AppendLine("Замовлення:");
             foreach (var order in orders)
                 report.AppendLine($"{order.Id};{order.CustomerName};{order.DishName};{order.Quantity};{order.TotalPrice}");
-            logger?.LogInformation("Результат експортовано у файл");
             return report.ToString();
         }
 
-        static void InitializeData()
+        static void InitializeData(RestaurantData? initialData)
         {
+            menu.Dishes.Clear();
+            customers.Clear();
+            orders.Clear();
+            tables.Clear();
+
+            if (initialData is not null)
+            {
+                foreach (var item in initialData.Dishes)
+                    menu.Dishes.Add(new Dish(item.Id, item.Name, item.Category, item.Price, item.Weight));
+                foreach (var item in initialData.Customers)
+                    customers.Add(new Customer(item.Id, item.Name, item.Age, item.Phone));
+                foreach (var item in initialData.Tables)
+                    tables.Add(new Table(item.Number, item.Seats));
+                return;
+            }
+
             menu.AddDish(new Dish
             {
                 Id = 1,
@@ -240,10 +254,10 @@ namespace RestaurantProgram
             Console.WriteLine("\n===== ДОДАВАННЯ СТРАВИ =====");
             Console.WriteLine("0 — повернутися назад");
 
-            string name = EnterText("Назва: ");
+            string? name = EnterText("Назва: ");
             if (name == null) return;
 
-            string category = EnterText("Категорія: ");
+            string? category = EnterText("Категорія: ");
             if (category == null) return;
 
             double price = EnterPositiveNumber("Ціна: ");
@@ -298,13 +312,13 @@ namespace RestaurantProgram
             Console.WriteLine("\n===== ДОДАВАННЯ КЛІЄНТА =====");
             Console.WriteLine("0 — повернутися назад");
 
-            string name = EnterName("Ім'я: ");
+            string? name = EnterName("Ім'я: ");
             if (name == null) return;
 
             int age = EnterAge("Вік: ");
             if (age == -1) return;
 
-            string phone = EnterPhone("Телефон: ");
+            string? phone = EnterPhone("Телефон: ");
             if (phone == null) return;
 
             if (customers.Any(c => c.Phone == phone))
@@ -372,7 +386,7 @@ namespace RestaurantProgram
 
             if (customerId == -1) return;
 
-            Customer customer = customers.FirstOrDefault(
+            Customer? customer = customers.FirstOrDefault(
                 c => c.Id == customerId);
 
             if (customer == null)
@@ -389,7 +403,7 @@ namespace RestaurantProgram
 
             if (dishId == -1) return;
 
-            Dish dish = menu.Dishes.FirstOrDefault(
+            Dish? dish = menu.Dishes.FirstOrDefault(
                 d => d.Id == dishId);
 
             if (dish == null)
@@ -460,7 +474,7 @@ namespace RestaurantProgram
 
             if (id == -1) return;
 
-            Order order = orders.FirstOrDefault(o => o.Id == id);
+            Order? order = orders.FirstOrDefault(o => o.Id == id);
 
             if (order == null)
             {
@@ -484,7 +498,7 @@ namespace RestaurantProgram
 
             if (number == -1) return;
 
-            Table table = tables.FirstOrDefault(
+            Table? table = tables.FirstOrDefault(
                 t => t.Number == number);
 
             if (table == null)
@@ -517,7 +531,7 @@ namespace RestaurantProgram
 
             if (customerId == -1) return;
 
-            Customer customer = customers.FirstOrDefault(
+            Customer? customer = customers.FirstOrDefault(
                 c => c.Id == customerId);
 
             if (customer == null)
@@ -552,7 +566,7 @@ namespace RestaurantProgram
 
             if (number == -1) return;
 
-            Table table = tables.FirstOrDefault(
+            Table? table = tables.FirstOrDefault(
                 t => t.Number == number);
 
             if (table == null)
@@ -589,7 +603,7 @@ namespace RestaurantProgram
 
             if (id == -1) return;
 
-            Order order = orders.FirstOrDefault(o => o.Id == id);
+            Order? order = orders.FirstOrDefault(o => o.Id == id);
 
             if (order == null)
             {
@@ -605,7 +619,8 @@ namespace RestaurantProgram
             Console.WriteLine("0. Назад");
             Console.Write("Оберіть дію: ");
 
-            string choice = Console.ReadLine();
+            string? choice = Console.ReadLine();
+            if (choice is null) return;
 
             if (choice == "0") return;
 
@@ -650,12 +665,14 @@ namespace RestaurantProgram
             Pause();
         }
 
-        static string EnterText(string message)
+        static string? EnterText(string message)
         {
             while (true)
             {
                 Console.Write(message);
-                string value = Console.ReadLine()?.Trim();
+                string? value = Console.ReadLine()?.Trim();
+
+                if (value is null) return null;
 
                 if (value == "0") return null;
 
@@ -685,17 +702,19 @@ namespace RestaurantProgram
             }
         }
 
-        static string EnterName(string message)
+        static string? EnterName(string message)
         {
             return EnterText(message);
         }
 
-        static string EnterPhone(string message)
+        static string? EnterPhone(string message)
         {
             while (true)
             {
                 Console.Write(message);
-                string phone = Console.ReadLine()?.Trim();
+                string? phone = Console.ReadLine()?.Trim();
+
+                if (phone is null) return null;
 
                 if (phone == "0") return null;
 
@@ -717,7 +736,9 @@ namespace RestaurantProgram
             while (true)
             {
                 Console.Write(message);
-                string input = Console.ReadLine();
+                string? input = Console.ReadLine();
+
+                if (input is null) return -1;
 
                 if (input == "0") return -1;
 
@@ -736,7 +757,9 @@ namespace RestaurantProgram
             while (true)
             {
                 Console.Write(message);
-                string input = Console.ReadLine();
+                string? input = Console.ReadLine();
+
+                if (input is null) return -1;
 
                 if (input == "0") return -1;
 
@@ -756,7 +779,9 @@ namespace RestaurantProgram
             while (true)
             {
                 Console.Write(message);
-                string input = Console.ReadLine();
+                string? input = Console.ReadLine();
+
+                if (input is null) return -1;
 
                 if (input == "0") return -1;
 
@@ -777,7 +802,9 @@ namespace RestaurantProgram
             while (true)
             {
                 Console.Write(message);
-                string input = Console.ReadLine();
+                string? input = Console.ReadLine();
+
+                if (input is null) return -1;
 
                 if (input == "0") return -1;
 
@@ -814,7 +841,8 @@ namespace RestaurantProgram
             while (true)
             {
                 Console.Write("Оберіть спосіб оплати: ");
-                string choice = Console.ReadLine();
+                string? choice = Console.ReadLine();
+                if (choice is null) return;
 
                 IPaymentMethod payment;
 

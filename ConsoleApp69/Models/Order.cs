@@ -12,7 +12,7 @@ namespace RestaurantProgram
         private double discount;
 
         // Дані оплати
-        private IPaymentMethod paymentMethod;
+        private IPaymentMethod? paymentMethod;
         private bool isPaid = false;
 
         public int Id { get; set; }

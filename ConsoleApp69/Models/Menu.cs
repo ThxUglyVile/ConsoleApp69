@@ -100,7 +100,7 @@ namespace RestaurantProgram
         // Видалення страви
         public virtual void RemoveDish(int id)
         {
-            Dish dish = Dishes.FirstOrDefault(
+            Dish? dish = Dishes.FirstOrDefault(
                 d => d.Id == id);
 
             if (dish == null)
@@ -114,7 +114,7 @@ namespace RestaurantProgram
         }
 
         // Пошук за назвою
-        public Dish FindDish(string name)
+        public Dish? FindDish(string name)
         {
             return Dishes.FirstOrDefault(d =>
                 d.Name.Equals(
@@ -123,7 +123,7 @@ namespace RestaurantProgram
         }
 
         // Перевантаження: пошук за ID
-        public Dish FindDish(int id)
+        public Dish? FindDish(int id)
         {
             return Dishes.FirstOrDefault(d => d.Id == id);
         }
@@ -154,7 +154,7 @@ namespace RestaurantProgram
         }
 
         // Пошук найдорожчої страви
-        public Dish GetMostExpensiveDish()
+        public Dish? GetMostExpensiveDish()
         {
             return Dishes.OrderByDescending(
                 d => d.Price).FirstOrDefault();

@@ -1,0 +1,15 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build ConsoleApp69",
+      "type": "process",
+      "command": "dotnet",
+      "args": [
+        "build",
+        "${workspaceFolder}/ConsoleApp69/ConsoleApp69.csproj"
+      ],
+      "problemMatcher": "$msCompile"
+    }
+  ]
+}

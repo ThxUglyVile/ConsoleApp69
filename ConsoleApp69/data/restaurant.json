@@ -1,0 +1,13 @@
+{
+  "dishes": [
+    { "id": 1, "name": "Margherita", "category": "Pizza", "price": 250, "weight": 500 },
+    { "id": 2, "name": "Carbonara", "category": "Pasta", "price": 220, "weight": 350 }
+  ],
+  "customers": [
+    { "id": 1, "name": "Mykhailo", "age": 21, "phone": "380502223344" }
+  ],
+  "tables": [
+    { "number": 1, "seats": 2 },
+    { "number": 2, "seats": 4 }
+  ]
+}
