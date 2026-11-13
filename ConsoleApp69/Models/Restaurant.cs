@@ -3,7 +3,7 @@ using System;
 
 namespace RestaurantProgram
 {
-    class Restaurant
+    public class Restaurant
     {
         // Інкапсуляція: закриті поля
         private string name = "";

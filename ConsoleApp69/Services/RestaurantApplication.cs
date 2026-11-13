@@ -1,18 +1,23 @@
 using Microsoft.Extensions.Logging;
+using RestaurantProgram.Initialization;
+using RestaurantProgram.UI;
 
 namespace RestaurantProgram.Services;
 
 /// <summary>Coordinates console startup and receives dependencies through DI.</summary>
 public sealed class RestaurantApplication(
     ILogger<RestaurantApplication> logger,
-    IFileDataService fileData) : IRestaurantApplication
+    IFileDataService fileData,
+    IRestaurantDataInitializer dataInitializer,
+    IRestaurantConsole restaurantConsole,
+    IReportBuilder reportBuilder) : IRestaurantApplication
 {
     public void Run(string[] args)
     {
         var originalInput = Console.In;
         try
         {
-            var workspaceRoot = Program.GetWorkspaceRoot();
+            var workspaceRoot = AppInitializer.GetWorkspaceRoot();
             var dataArgument = GetArgument(args, "--data");
             var inputArgument = GetArgument(args, "--input");
             var dataPath = dataArgument is null ? null : ResolvePath(dataArgument, workspaceRoot);
@@ -28,9 +33,10 @@ public sealed class RestaurantApplication(
             if (inputPath is not null)
                 Console.SetIn(new StringReader(string.Join(Environment.NewLine, fileData.ReadLines(inputPath))));
 
-            Program.RunApplication(logger, initialData);
+            var state = dataInitializer.Initialize(initialData);
+            restaurantConsole.Run(state);
 
-            fileData.WriteAllText(outputPath, Program.BuildReport());
+            fileData.WriteAllText(outputPath, reportBuilder.Build(state));
             logger.LogInformation("Report saved to {OutputPath}", outputPath);
         }
         catch (Exception ex)

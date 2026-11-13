@@ -1,5 +1,8 @@
 using RestaurantProgram;
+using RestaurantProgram.Enums;
+using RestaurantProgram.Initialization;
 using RestaurantProgram.Services;
+using RestaurantProgram.UI;
 using Xunit;
 
 namespace RestaurantProgram.Tests;
@@ -56,6 +59,39 @@ public class RestaurantModelTests
         finally
         {
             File.Delete(path);
+        }
+    }
+
+    [Fact]
+    public void InitializerCreatesDefaultRestaurantState()
+    {
+        var state = new RestaurantDataInitializer().Initialize(null);
+
+        Assert.Equal("La Piazza", state.Restaurant.Name);
+        Assert.Equal(6, state.Menu.Dishes.Count);
+        Assert.Single(state.Customers);
+        Assert.Equal(5, state.Tables.Count);
+        Assert.Empty(state.Orders);
+    }
+
+    [Fact]
+    public void MainMenuMapsNumberToNamedEnumAndRejectsUnknownNumber()
+    {
+        var originalInput = Console.In;
+        var originalOutput = Console.Out;
+        try
+        {
+            Console.SetIn(new StringReader("7\n99\n"));
+            Console.SetOut(new StringWriter());
+            var menu = new MainMenu();
+
+            Assert.Equal(MenuChoice.CreateOrder, menu.ReadChoice());
+            Assert.Equal(MenuChoice.Invalid, menu.ReadChoice());
+        }
+        finally
+        {
+            Console.SetIn(originalInput);
+            Console.SetOut(originalOutput);
         }
     }
 }
