@@ -8,6 +8,7 @@
       "preLaunchTask": "build ConsoleApp69",
       "program": "${workspaceFolder}/ConsoleApp69/bin/Debug/net10.0/ConsoleApp69.dll",
       "args": [
+        "--web",
         "--data",
         "${workspaceFolder}/ConsoleApp69/data/restaurant.json",
         "--output",

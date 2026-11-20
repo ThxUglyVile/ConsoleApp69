@@ -1,10 +1,24 @@
 {
   "dishes": [
     { "id": 1, "name": "Margherita", "category": "Pizza", "price": 250, "weight": 500 },
-    { "id": 2, "name": "Carbonara", "category": "Pasta", "price": 220, "weight": 350 }
+    { "id": 2, "name": "Carbonara", "category": "Pasta", "price": 220, "weight": 350 },
+    { "id": 3, "name": "Пепероні", "category": "Піца", "price": 310, "weight": 540 },
+    { "id": 4, "name": "Чотири сири", "category": "Піца", "price": 330, "weight": 500 },
+    { "id": 5, "name": "Лазанья Болоньєзе", "category": "Паста", "price": 285, "weight": 400 },
+    { "id": 6, "name": "Різото з грибами", "category": "Основні страви", "price": 260, "weight": 380 },
+    { "id": 7, "name": "Салат Цезар", "category": "Салати", "price": 195, "weight": 280 },
+    { "id": 8, "name": "Тірамісу", "category": "Десерти", "price": 145, "weight": 160 },
+    { "id": 9, "name": "Лимонад", "category": "Напої", "price": 75, "weight": 300 },
+    { "id": 10, "name": "Капучино", "category": "Напої", "price": 85, "weight": 250 }
   ],
   "customers": [
-    { "id": 1, "name": "Mykhailo", "age": 21, "phone": "380502223344" }
+    { "id": 1, "name": "Mykhailo", "age": 21, "phone": "380502223344" },
+    { "id": 2, "name": "Шрам", "age": 32, "phone": "0500000002" },
+    { "id": 3, "name": "Скіф", "age": 28, "phone": "0500000003" },
+    { "id": 4, "name": "Стрілець", "age": 35, "phone": "0500000004" },
+    { "id": 5, "name": "Дегтярьов", "age": 41, "phone": "0500000005" },
+    { "id": 6, "name": "Ґеральд", "age": 38, "phone": "0500000006" },
+    { "id": 7, "name": "Генрі", "age": 30, "phone": "0500000007" }
   ],
   "tables": [
     { "number": 1, "seats": 2 },

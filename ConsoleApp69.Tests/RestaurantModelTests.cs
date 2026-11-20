@@ -94,4 +94,51 @@ public class RestaurantModelTests
             Console.SetOut(originalOutput);
         }
     }
+
+    [Fact]
+    public void TestPaymentMarksOrderAsPaidAndPreventsFurtherDiscounts()
+    {
+        var order = new Order
+        {
+            Id = 1,
+            CustomerName = "Ivan",
+            DishName = "Borshch",
+            Quantity = 1,
+            OriginalTotalPrice = 100
+        };
+        var originalOutput = Console.Out;
+        try
+        {
+            Console.SetOut(new StringWriter());
+            order.SetPaymentMethod(new CardPayment());
+            Assert.True(order.ProcessPayment());
+            Assert.True(order.IsPaid);
+            order.ApplyDiscount(50);
+            Assert.Equal(100, order.TotalPrice);
+        }
+        finally { Console.SetOut(originalOutput); }
+    }
+
+    [Fact]
+    public void DishRejectsInvalidPriceAndWeight()
+    {
+        var dish = new Dish(1, "Soup", "First", 100, 300);
+        Assert.Throws<ArgumentException>(() => dish.Price = double.NaN);
+        Assert.Throws<ArgumentException>(() => dish.Weight = 0);
+    }
+
+    [Fact]
+    public void SharedOrderServiceCreatesOrdersFromValidatedRestaurantEntities()
+    {
+        var state = new RestaurantDataInitializer().Initialize(null);
+        var service = new RestaurantOrderService();
+
+        var order = service.Create(state, customerId: 1, dishId: 1, quantity: 2);
+
+        Assert.Equal(1, order.Id);
+        Assert.Equal(1, order.CustomerId);
+        Assert.Equal("Михайло", order.CustomerName);
+        Assert.Equal(500, order.TotalPrice);
+        Assert.Same(order, Assert.Single(state.Orders));
+    }
 }

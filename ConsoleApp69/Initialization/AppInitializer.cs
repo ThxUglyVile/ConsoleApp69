@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using RestaurantProgram.Services;
 using RestaurantProgram.UI;
+using RestaurantProgram.Web;
 
 namespace RestaurantProgram.Initialization;
 
@@ -15,9 +16,11 @@ public static class AppInitializer
                 Path.Combine(workspaceRoot, "logs", "restaurant.log"))))
             .AddSingleton<IFileDataService, FileDataService>()
             .AddSingleton<IReportBuilder, RestaurantReportBuilder>()
+            .AddSingleton<IRestaurantOrderService, RestaurantOrderService>()
             .AddSingleton<IRestaurantDataInitializer, RestaurantDataInitializer>()
             .AddSingleton<IMainMenu, MainMenu>()
             .AddSingleton<IRestaurantConsole, RestaurantConsole>()
+            .AddSingleton<IRestaurantWebHost, RestaurantWebHost>()
             .AddSingleton<IRestaurantApplication, RestaurantApplication>()
             .BuildServiceProvider();
     }

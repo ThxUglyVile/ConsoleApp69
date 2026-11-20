@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using RestaurantProgram.Initialization;
 using RestaurantProgram.UI;
+using RestaurantProgram.Web;
 
 namespace RestaurantProgram.Services;
 
@@ -10,7 +11,8 @@ public sealed class RestaurantApplication(
     IFileDataService fileData,
     IRestaurantDataInitializer dataInitializer,
     IRestaurantConsole restaurantConsole,
-    IReportBuilder reportBuilder) : IRestaurantApplication
+    IReportBuilder reportBuilder,
+    IRestaurantWebHost webHost) : IRestaurantApplication
 {
     public void Run(string[] args)
     {
@@ -34,7 +36,11 @@ public sealed class RestaurantApplication(
                 Console.SetIn(new StringReader(string.Join(Environment.NewLine, fileData.ReadLines(inputPath))));
 
             var state = dataInitializer.Initialize(initialData);
-            restaurantConsole.Run(state);
+
+            if (args.Contains("--web", StringComparer.OrdinalIgnoreCase))
+                webHost.Run(state);
+            else
+                restaurantConsole.Run(state);
 
             fileData.WriteAllText(outputPath, reportBuilder.Build(state));
             logger.LogInformation("Report saved to {OutputPath}", outputPath);

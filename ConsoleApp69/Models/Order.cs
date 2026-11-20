@@ -16,6 +16,7 @@ namespace RestaurantProgram
         private bool isPaid = false;
 
         public int Id { get; set; }
+        public int? CustomerId { get; set; }
 
         public string CustomerName { get; set; } = "";
         public string DishName { get; set; } = "";

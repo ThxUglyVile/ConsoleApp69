@@ -12,4 +12,5 @@ public sealed class RestaurantState(
     public List<Customer> Customers { get; } = customers;
     public List<Order> Orders { get; } = orders;
     public List<Table> Tables { get; } = tables;
+    public List<CartItem> Cart { get; } = [];
 }

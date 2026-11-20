@@ -8,6 +8,7 @@ public sealed class RestaurantConsole : IRestaurantConsole
 {
     private readonly ILogger<RestaurantConsole> logger;
     private readonly IMainMenu mainMenu;
+    private readonly IRestaurantOrderService orderService;
     private RestaurantState state = null!;
 
     private Restaurant restaurant => state.Restaurant;
@@ -16,10 +17,11 @@ public sealed class RestaurantConsole : IRestaurantConsole
     private List<Order> orders => state.Orders;
     private List<Table> tables => state.Tables;
 
-    public RestaurantConsole(ILogger<RestaurantConsole> logger, IMainMenu mainMenu)
+    public RestaurantConsole(ILogger<RestaurantConsole> logger, IMainMenu mainMenu, IRestaurantOrderService orderService)
     {
         this.logger = logger;
         this.mainMenu = mainMenu;
+        this.orderService = orderService;
     }
     public void Run(RestaurantState initialState)
     {
@@ -246,24 +248,7 @@ public sealed class RestaurantConsole : IRestaurantConsole
 
         if (quantity == -1) return;
 
-        double total = dish.Price * quantity;
-
-        int id = orders.Count == 0
-            ? 1
-            : orders.Max(o => o.Id) + 1;
-
-        Order order = new Order
-        {
-            Id = id,
-            CustomerName = customer.Name,
-            DishName = dish.Name,
-            Quantity = quantity,
-            OriginalTotalPrice = total,
-            TotalPrice = total,
-            Discount = 0
-        };
-
-        orders.Add(order);
+        var order = orderService.Create(state, customer.Id, dish.Id, quantity);
 
         Console.WriteLine("Замовлення створено.");
 

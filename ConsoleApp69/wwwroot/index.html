@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#17231f">
+  <title>La Piazza — керування рестораном</title>
+  <link rel="stylesheet" href="/css/site.css">
+  <script src="/js/app.js" defer></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="#dashboard"><span class="brand-mark">LP</span><span>La Piazza<small>ПАНЕЛЬ КЕРУВАННЯ</small></span></a>
+    <nav aria-label="Розділи">
+      <a class="nav-link active" href="#dashboard" data-view="dashboard"><span>⌂</span> Огляд</a>
+      <a class="nav-link" href="#dishes" data-view="dishes"><span>◈</span> Меню</a>
+      <a class="nav-link" href="#cart" data-view="cart"><span>▣</span> Кошик <b id="cart-count" class="cart-count">0</b></a>
+      <a class="nav-link" href="#customers" data-view="customers"><span>♙</span> Клієнти</a>
+      <a class="nav-link" href="#orders" data-view="orders"><span>▤</span> Замовлення</a>
+      <a class="nav-link" href="#tables" data-view="tables"><span>▦</span> Столики</a>
+    </nav>
+    <div class="sidebar-note"><span class="status-dot"></span> Сервер працює<small>Локальний застосунок</small></div>
+  </aside>
+
+  <main class="main-content">
+    <header class="topbar"><div><p class="eyebrow">РЕСТОРАН / LA PIAZZA</p><h1 id="page-title">Огляд</h1></div><div class="top-actions"><a class="button button-light" href="/api/reports/current">Завантажити звіт</a><button class="button button-light" id="refresh-button" type="button">↻ Оновити</button></div></header>
+    <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
+
+    <section class="view" id="view-dashboard">
+      <div class="welcome"><div><p class="eyebrow">СЬОГОДНІ В РЕСТОРАНІ</p><h2 id="restaurant-name">Завантаження…</h2><p id="restaurant-meta" class="muted"></p></div><span class="welcome-icon">✳</span></div>
+      <div class="stats-grid" id="stats"></div>
+      <div class="content-card"><div class="section-heading"><div><p class="eyebrow">ОСТАННІ ОПЕРАЦІЇ</p><h2>Замовлення</h2></div><a href="#orders" data-view="orders" class="text-link">Усі замовлення →</a></div><div id="recent-orders"></div></div>
+    </section>
+
+    <section class="view" id="view-dishes" hidden>
+      <div class="section-heading"><div><p class="eyebrow">АСОРТИМЕНТ</p><h2>Меню ресторану</h2></div><button class="button button-primary" data-open="dish-dialog">＋ Додати страву</button></div>
+      <div class="catalog-tools"><label class="search-box">Пошук<input id="dish-search" type="search" placeholder="Назва або категорія"></label><label>Категорія<select id="dish-category"><option value="">Усі категорії</option></select></label><label>Сортування<select id="dish-sort"><option value="name">За назвою</option><option value="price-asc">Ціна: від дешевих</option><option value="price-desc">Ціна: від дорогих</option></select></label></div>
+      <div class="content-card table-wrap"><table><thead><tr><th>Страва</th><th>Категорія</th><th>Ціна</th><th>Вага</th><th></th></tr></thead><tbody id="dishes-body"></tbody></table></div>
+    </section>
+
+    <section class="view" id="view-cart" hidden>
+      <div class="section-heading"><div><p class="eyebrow">ПОКУПКИ</p><h2>Кошик</h2></div><button class="button button-light" id="clear-cart" type="button">Очистити кошик</button></div>
+      <div class="content-card" id="cart-content"></div>
+      <div class="content-card cart-checkout" id="cart-checkout" hidden><strong id="cart-total"></strong><label>Клієнт<select id="checkout-customer"></select></label><button class="button button-primary" id="checkout-cart" type="button">Оформити замовлення</button></div>
+      <p class="payment-note">Оплата на сайті працює лише в тестовому режимі: реальні кошти не списуються. Для справжніх платежів потрібне підключення провайдера.</p>
+    </section>
+
+    <section class="view" id="view-customers" hidden>
+      <div class="section-heading"><div><p class="eyebrow">БАЗА ГОСТЕЙ</p><h2>Клієнти</h2></div><button class="button button-primary" data-open="customer-dialog">＋ Додати клієнта</button></div>
+      <div class="content-card table-wrap"><table><thead><tr><th>Клієнт</th><th>Вік</th><th>Телефон</th><th></th></tr></thead><tbody id="customers-body"></tbody></table></div>
+    </section>
+
+    <section class="view" id="view-orders" hidden>
+      <div class="section-heading"><div><p class="eyebrow">ОБСЛУГОВУВАННЯ</p><h2>Замовлення</h2></div><button class="button button-primary" data-open="order-dialog">＋ Створити замовлення</button></div>
+      <div class="content-card table-wrap"><table><thead><tr><th>№</th><th>Клієнт</th><th>Страва</th><th>Кількість</th><th>Сума</th><th>Оплата</th><th></th></tr></thead><tbody id="orders-body"></tbody></table></div>
+    </section>
+
+    <section class="view" id="view-tables" hidden>
+      <div class="section-heading"><div><p class="eyebrow">ЗАЛ РЕСТОРАНУ</p><h2>Столики та бронювання</h2></div></div>
+      <div class="table-cards" id="tables-list"></div>
+    </section>
+  </main>
+
+  <dialog id="dish-dialog"><form id="dish-form" class="dialog-form"><div class="dialog-title"><div><p class="eyebrow">АСОРТИМЕНТ</p><h2>Нова страва</h2></div><button class="icon-button" type="button" data-close aria-label="Закрити">×</button></div><label>Назва<input name="name" required maxlength="80"></label><label>Категорія<input name="category" required maxlength="40" placeholder="Наприклад, Піца"></label><div class="form-row"><label>Ціна, грн<input name="price" type="number" min="0" step="0.01" required></label><label>Вага, г<input name="weight" type="number" min="1" required></label></div><button class="button button-primary" type="submit">Зберегти страву</button></form></dialog>
+  <dialog id="customer-dialog"><form id="customer-form" class="dialog-form"><div class="dialog-title"><div><p class="eyebrow">БАЗА ГОСТЕЙ</p><h2>Новий клієнт</h2></div><button class="icon-button" type="button" data-close aria-label="Закрити">×</button></div><label>Ім’я<input name="name" required maxlength="80"></label><div class="form-row"><label>Вік<input name="age" type="number" min="0" max="120" required></label><label>Телефон<input name="phone" type="tel" required maxlength="30"></label></div><button class="button button-primary" type="submit">Додати клієнта</button></form></dialog>
+  <dialog id="order-dialog"><form id="order-form" class="dialog-form"><div class="dialog-title"><div><p class="eyebrow">ОБСЛУГОВУВАННЯ</p><h2>Нове замовлення</h2></div><button class="icon-button" type="button" data-close aria-label="Закрити">×</button></div><label>Клієнт<select name="customerId" id="order-customer" required></select></label><label>Страва<select name="dishId" id="order-dish" required></select></label><label>Кількість<input name="quantity" type="number" value="1" min="1" required></label><button class="button button-primary" type="submit">Створити замовлення</button></form></dialog>
+  <dialog id="reservation-dialog"><form id="reservation-form" class="dialog-form"><div class="dialog-title"><div><p class="eyebrow">БРОНЮВАННЯ</p><h2>Забронювати столик</h2></div><button class="icon-button" type="button" data-close aria-label="Закрити">×</button></div><input name="tableNumber" type="hidden"><label>Клієнт<select name="customerId" id="reservation-customer" required></select></label><label>Кількість гостей<input name="guests" type="number" min="1" required></label><button class="button button-primary" type="submit">Підтвердити бронювання</button></form></dialog>
+  <dialog id="dish-details-dialog"><div class="dialog-form"><div class="dialog-title"><div><p class="eyebrow">ІНФОРМАЦІЯ ПРО СТРАВУ</p><h2 id="dish-details-title"></h2></div><button class="icon-button" type="button" data-close aria-label="Закрити">×</button></div><div id="dish-details-body" class="detail-list"></div><button class="button button-primary" type="button" data-close>Гаразд</button></div></dialog>
+  <dialog id="order-details-dialog"><div class="dialog-form"><div class="dialog-title"><div><p class="eyebrow">ДЕТАЛІ ПОКУПКИ</p><h2 id="order-details-title"></h2></div><button class="icon-button" type="button" data-close aria-label="Закрити">×</button></div><div id="order-details-body" class="detail-list"></div><button class="button button-primary" type="button" data-close>Гаразд</button></div></dialog>
+</body>
+</html>
